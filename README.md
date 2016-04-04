@@ -1,2 +1,2 @@
-# Realtime-Communication-Components
-Communications system and dashboard application for realtime monitoring of data in robotics applications.
+# RRDTP (Realtime Robotics Data Transmission Protocol)
+RRDTP is a realtime data transmission protocol intended for use in monitoring sensor data in robotics applications. This library can be compiled for Windows, Linux, and Mac OSX, systems. Arduino support is planned as well.
