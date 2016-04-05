@@ -1,5 +1,6 @@
 #ifndef Socket_H
 #define Socket_H
+#include "RRDTP/Platform.h"
 
 namespace rrdtp
 {	
@@ -38,8 +39,10 @@ namespace rrdtp
 		virtual SOCKET_ERROR connect(const char* ip, unsigned int port, SOCKET_PROTOCOL protocol) = 0;
 		
 		///@brief Opens socket in server mode and listens for incoming connections and incoming packets.
-		///This method is non-blocking and will spawn a separate thread to listen for incoming connections and incoming packets.
 		virtual SOCKET_ERROR listen(unsigned int port, SOCKET_PROTOCOL protocol) = 0;
+		
+		///@brief Accepts the next incoming connection in the queue.
+		virtual SOCKET_ERROR accept() = 0;
 		
 		///@brief Close the socket.
 		virtual void close() = 0;
@@ -47,6 +50,10 @@ namespace rrdtp
 		///@brief Sends data from this socket.
 		///@return The number of bytes actually sent.
 		virtual size_t send(const void* data, size_t sz) = 0;
+		
+		///@brief Polls the socket for incoming packets.
+		///This is where data should be recieved from the socket, and callbacks should be triggered.
+		virtual void poll() = 0;
 		
 	private:
 		

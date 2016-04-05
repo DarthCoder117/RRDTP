@@ -12,7 +12,11 @@ WinsockSocket::WinsockSocket(DataRecievedCallback dataRecievedCallback, void* us
 		
 WinsockSocket::~WinsockSocket()
 {
-	
+	if (m_wsaData != NULL)
+	{
+		WSACleanup();
+		m_wsaData = NULL;
+	}
 }
 
 static WSADATA* WinsockSocket::m_wsaData = NULL;
@@ -26,17 +30,17 @@ SOCKET_ERROR WinsockSocket::commonInit()
 		{
 			delete m_wsaData;
 			m_wsaData = NULL;
-			return false;
+			return SE_ERROR;
 		}
 	}
 	
 	m_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_UDP);
 	if(m_socket == INVALID_SOCKET)
     {
-		WSACleanup();
+		return SE_ERROR;
     }
 	
-	return true;
+	return SE_SUCCESS;
 }
 
 SOCKET_ERROR WinsockSocket::connect(const char* ip, unsigned int port, SOCKET_PROTOCOL protocol)
@@ -54,17 +58,17 @@ SOCKET_ERROR WinsockSocket::connect(const char* ip, unsigned int port, SOCKET_PR
 	
 	if (connect(m_socket, (struct sockaddr*)&server , sizeof(server)) < 0)
     {
-		return;//return FAILURE;
+		return SE_FAILURE;
 	}
 	
-	return SUCCESS;
+	return SE_SUCCESS;
 }
 
 SOCKET_ERROR WinsockSocket::listen(unsigned int port, SOCKET_PROTOCOL protocol)
 {
 	if (!commonInit())
 	{
-		return;// FAILURE;
+		return SE_FAILURE;
 	}	
 	
 	struct sockaddr_in server;
@@ -75,18 +79,37 @@ SOCKET_ERROR WinsockSocket::listen(unsigned int port, SOCKET_PROTOCOL protocol)
 	
 	if (connect(m_socket, (struct sockaddr*)&server , sizeof(server)) < 0)
     {
-		return;// FAILURE;
+		return SE_FAILURE;
 	}
 	
-	//return SUCCESS;
+	listen(m_socket, 3);
+	
+	return SE_SUCCESS;
+}
+
+SOCKET_ERROR WinsockSocket::accept()
+{
+	SOCKET newSocket;
+	newSocket = accept(s , (struct sockaddr *)&client, &c);
+    if (newSocket == INVALID_SOCKET)
+    {
+        return SE_FAILURE;
+    }
+	
+	return SE_SUCCESS;
 }
 
 void WinsockSocket::close()
 {
-	WSACleanup();
+	closesocket(m_socket);
 }
 
 size_t WinsockSocket::send(const void* data, size_t sz)
+{
+	return send(m_socket, data, sz, 0);
+}
+
+void WinsockSocket::poll()
 {
 	
 }

@@ -24,9 +24,13 @@ namespace rrdtp
 		
 		SOCKET_ERROR listen(unsigned int port, SOCKET_PROTOCOL protocol);
 		
-		void close() = 0;
+		SOCKET_ERROR accept();
+		
+		void close();
 		
 		size_t send(const void* data, size_t sz);
+		
+		void poll();
 		
 	private:
 		
