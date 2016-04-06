@@ -111,7 +111,13 @@ size_t WinsockSocket::send(const void* data, size_t sz)
 
 void WinsockSocket::poll()
 {
+	char* data[2000];
+	size_t recievedDataSz = recv(m_socket, data, 2000);
 	
+	if (m_dataRecievedCallback)
+	{
+		m_dataRecievedCallback((void*)data, recievedDataSz);
+	}
 }
 
 #endif

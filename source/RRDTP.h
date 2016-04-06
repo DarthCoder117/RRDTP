@@ -6,5 +6,6 @@
 
 #include "RRDTP/Platform.h"
 #include "RRDTP/Types.h"
+#include "RRDTP/Sockets/Socket.h"
 
 #endif

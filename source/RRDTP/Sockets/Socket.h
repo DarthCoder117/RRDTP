@@ -1,9 +1,12 @@
 #ifndef Socket_H
 #define Socket_H
+#include <cstdio>
 #include "RRDTP/Platform.h"
 
 namespace rrdtp
 {	
+	typedef size_t SocketID;
+
 	///@brief Socket error code enum.
 	enum SOCKET_ERROR
 	{
@@ -14,8 +17,8 @@ namespace rrdtp
 	///@brief The protocol to use when opening the socket.
 	enum SOCKET_PROTOCOL
 	{
-		TCP,
-		UDP
+		SP_TCP,
+		SP_UDP
 	};
 	
 	//Callback function pointer types
@@ -63,7 +66,6 @@ namespace rrdtp
 		
 		//Copy constructors are private because sockets cannot be copied.
 		Socket(const Socket& oth){}
-		Socket(Socket& oth){}
 	};
 }
 
