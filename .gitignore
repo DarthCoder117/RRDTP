@@ -28,4 +28,4 @@
 *.app
 
 # Custom folders
-./projects/*
+projects/*

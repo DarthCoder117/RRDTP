@@ -16,9 +16,9 @@ namespace rrdtp
 		
 		~BSDSocket();
 		
-		SOCKET_ERROR connect(const char* ip, unsigned int port, SOCKET_PROTOCOL protocol);
+		E_SOCKET_ERROR connect(const char* ip, unsigned int port, E_SOCKET_PROTOCOL protocol);
 		
-		SOCKET_ERROR listen(unsigned int port, SOCKET_PROTOCOL protocol);
+		E_SOCKET_ERROR listen(unsigned int port, E_SOCKET_PROTOCOL protocol);
 		
 		void close() = 0;
 		

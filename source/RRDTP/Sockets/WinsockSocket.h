@@ -6,6 +6,7 @@
 #ifdef RRDTP_PLATFORM_WINDOWS
 
 #include<stdio.h>
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include<winsock2.h>
 #pragma comment(lib,"ws2_32.lib")
 
@@ -20,22 +21,22 @@ namespace rrdtp
 		
 		~WinsockSocket();
 		
-		SOCKET_ERROR connect(const char* ip, unsigned int port, SOCKET_PROTOCOL protocol);
+		E_SOCKET_ERROR Connect(const char* ip, unsigned int port, E_SOCKET_PROTOCOL protocol);
 		
-		SOCKET_ERROR listen(unsigned int port, SOCKET_PROTOCOL protocol);
+		E_SOCKET_ERROR Listen(unsigned int port, E_SOCKET_PROTOCOL protocol);
 		
-		SOCKET_ERROR accept();
+		E_SOCKET_ERROR Accept();
 		
-		void close();
+		void Close();
 		
-		size_t send(const void* data, size_t sz);
+		size_t Send(const void* data, size_t sz);
 		
-		void poll();
+		void Poll();
 		
 	private:
 		
 		///@brief Handles Winsock initialization common between client and server sockets.
-		SOCKET_ERROR commonInit();
+		E_SOCKET_ERROR CommonInit();
 		
 		static WSADATA* m_wsaData;
 		SOCKET m_socket;

@@ -4,30 +4,23 @@
 namespace rrdtp
 {
 	///@brief Enum identifying the type of data to be sent in a data packet.
-	enum DATA_TYPE
+	enum E_DATA_TYPE
 	{
-		DT_INT32,
-		DT_INT64,
-		DT_FLOAT,
-		DT_DOUBLE,
-		DT_BOOLEAN,
-		DT_STRING,
-		DT_UNFORMATTED
+		EDT_INT32,
+		EDT_INT64,
+		EDT_FLOAT,
+		EDT_DOUBLE,
+		EDT_BOOLEAN,
+		EDT_STRING,
+		EDT_UNFORMATTED
 	};
 	
 	///@brief Data packet to be sent over the network.
 	struct DataPacket
 	{
-		DATA_TYPE m_type;
+		E_DATA_TYPE m_type;
 		void* m_data;
 		size_t m_dataSz;
-	};
-	
-	///@brief Error code enum for error checking without using exceptions.
-	enum ERROR
-	{
-		SUCCESS,///< Generic success code
-		FAILURE///< Generic error code
 	};
 }
 
