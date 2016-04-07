@@ -4,7 +4,7 @@
 #include "RRDTP/Sockets/Socket.h"
 
 #ifdef RRDTP_PLATFORM_WINDOWS
-
+#include <list>
 #include<stdio.h>
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include<winsock2.h>
@@ -25,21 +25,25 @@ namespace rrdtp
 		
 		E_SOCKET_ERROR Listen(unsigned int port, E_SOCKET_PROTOCOL protocol);
 		
-		E_SOCKET_ERROR Accept();
+		HostID GetHostID() { return m_socket; }
+
+		HostID Accept(E_SOCKET_ERROR* errorCodeOut = NULL);
 		
 		void Close();
 		
-		size_t Send(const void* data, size_t sz);
+		size_t Send(HostID host, const void* data, size_t sz);
 		
 		void Poll();
 		
 	private:
 		
 		///@brief Handles Winsock initialization common between client and server sockets.
-		E_SOCKET_ERROR CommonInit();
+		E_SOCKET_ERROR CommonInit(E_SOCKET_PROTOCOL protocol);
 		
 		static WSADATA* m_wsaData;
 		SOCKET m_socket;
+
+		std::list<SOCKET> m_connectedClients;///< List of connected clients (only used on server sockets).
 	};
 }
 

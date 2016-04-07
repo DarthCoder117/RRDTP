@@ -21,9 +21,11 @@ namespace rrdtp
 		ESP_UDP
 	};
 	
+	class Socket;
+
 	//Callback function pointer types
 	typedef void (*ConnectionAcceptedCallback)();
-	typedef void (*DataRecievedCallback)(void* data, size_t sz);
+	typedef void (*DataRecievedCallback)(Socket*, HostID, void* data, size_t sz);
 	
 	///@brief Base class for low level socket communications.
 	class Socket
@@ -48,15 +50,25 @@ namespace rrdtp
 		///@brief Opens socket in server mode and listens for incoming connections and incoming packets.
 		virtual E_SOCKET_ERROR Listen(unsigned int port, E_SOCKET_PROTOCOL protocol) = 0;
 		
+		///@return The host ID of the socket.
+		virtual HostID GetHostID() = 0;
+
 		///@brief Accepts the next incoming connection in the queue.
-		virtual E_SOCKET_ERROR Accept() = 0;
+		///@param errorCodeOut Optional error code out parameter.
+		///@return Returns an ID to refer to the accepted connection, or returns -1 if an error occurred.
+		virtual HostID Accept(E_SOCKET_ERROR* errorCodeOut=NULL) = 0;
 		
 		///@brief Close the socket.
 		virtual void Close() = 0;
 		
-		///@brief Sends data from this socket.
+		///@brief Sends data from this socket without specifying a host to send to.
+		///This will only work on client sockets, because they recieve no socket ID when connecting to the server.
 		///@return The number of bytes actually sent.
-		virtual size_t Send(const void* data, size_t sz) = 0;
+		virtual size_t Send(const void* data, size_t sz);
+		///@brief Sends data from this socket.
+		///@param host The remote host to send the data to.
+		///@return The number of bytes actually sent.
+		virtual size_t Send(HostID host, const void* data, size_t sz) = 0;
 		
 		///@brief Polls the socket for incoming packets.
 		///This is where data should be recieved from the socket, and callbacks should be triggered.

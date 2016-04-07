@@ -14,3 +14,8 @@ add_library(rrdtp-lib STATIC ${rrdtp_SRC})
 #Tests
 add_executable(socket-test "${PROJECT_SOURCE_DIR}/test/SocketTest.cpp")
 target_link_libraries (socket-test rrdtp-lib)
+
+add_executable(server-test "${PROJECT_SOURCE_DIR}/test/ServerTest.cpp")
+target_link_libraries (server-test rrdtp-lib)
+add_executable(client-test "${PROJECT_SOURCE_DIR}/test/ClientTest.cpp")
+target_link_libraries (client-test rrdtp-lib)
