@@ -17,8 +17,3 @@ Socket* Socket::Create(DataRecievedCallback dataRecievedCallback, void* userPtr,
 	return new BSDSocket(dataRecievedCallback, userPtr, connectionAcceptedCallback);
 	#endif
 }
-
-size_t Socket::Send(const void* data, size_t sz)
-{
-	return Send(GetHostID(), data, sz);
-}

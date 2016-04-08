@@ -128,7 +128,14 @@ HostID WinsockSocket::Accept(E_SOCKET_ERROR* errorCodeOut)
 	{
 		*errorCodeOut = ESE_SUCCESS;
 	}
+
 	m_connectedClients.push_back(newSocket);
+
+	if (m_connectionAcceptedCallback != NULL)
+	{
+		m_connectionAcceptedCallback(this, newSocket);
+	}
+
 	return (size_t)newSocket;
 }
 
@@ -144,29 +151,22 @@ void WinsockSocket::Close()
 	m_socket = NULL;
 }
 
-size_t WinsockSocket::Send(HostID host, const void* data, size_t sz)
+size_t WinsockSocket::Send(const void* data, size_t sz, HostID host)
 {
-	return send((SOCKET)host, (const char*)data, sz, 0);
+	if (m_isServer)//The server needs a host ID specified to send the data to.
+	{
+		return send((SOCKET)host, (const char*)data, sz, 0);
+	}
+	
+	return send(m_socket, (const char*)data, sz, 0);
 }
 
 void WinsockSocket::Poll()
 {
 	char data[2000];
 
-	//Client just reads its own socket connection
-	if (!m_isServer)
-	{
-		int recievedDataSz = recv(m_socket, data, 2000, 0);
-		if (recievedDataSz != SOCKET_ERROR)
-		{
-			if (m_dataRecievedCallback != NULL)
-			{
-				m_dataRecievedCallback(this, m_socket, (void*)data, recievedDataSz);
-			}
-		}
-	}
-	//Server has to accept incoming connections and read data from all connected client sockets
-	else
+	//Server socket reads data from all connected client sockets
+	if (m_isServer)
 	{
 		std::list<SOCKET>::iterator iter;
 		for (iter = m_connectedClients.begin(); iter != m_connectedClients.end(); ++iter)
@@ -178,6 +178,18 @@ void WinsockSocket::Poll()
 				{
 					m_dataRecievedCallback(this, *iter, (void*)data, recievedDataSz);
 				}
+			}
+		}
+	}
+	//Client socket only needs to read from itself
+	else
+	{
+		int recievedDataSz = recv(m_socket, data, 2000, 0);
+		if (recievedDataSz != SOCKET_ERROR)
+		{
+			if (m_dataRecievedCallback != NULL)
+			{
+				m_dataRecievedCallback(this, m_socket, (void*)data, recievedDataSz);
 			}
 		}
 	}

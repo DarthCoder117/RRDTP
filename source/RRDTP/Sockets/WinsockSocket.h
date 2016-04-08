@@ -33,7 +33,7 @@ namespace rrdtp
 		
 		void Close();
 		
-		size_t Send(HostID host, const void* data, size_t sz);
+		size_t Send(const void* data, size_t sz, HostID host=-1);
 		
 		void Poll();
 		

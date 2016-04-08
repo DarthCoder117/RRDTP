@@ -23,9 +23,16 @@ namespace rrdtp
 	
 	class Socket;
 
-	//Callback function pointer types
-	typedef void (*ConnectionAcceptedCallback)();
-	typedef void (*DataRecievedCallback)(Socket*, HostID, void* data, size_t sz);
+	///@brief Callback for when a new client connects (server sockets only).
+	///@param self The socket the event occured for.
+	///@param client The host ID of the client that connected to the server.
+	typedef void (*ConnectionAcceptedCallback)(Socket* self, HostID client);
+	///@brief Callback for when data is recieved on the socket.
+	///@param self The socket the event occured for.
+	///@param sender The host ID of the socket that sent the message (server sockets only).
+	///@param data Pointer to the data recieved.
+	///@param sz The amount of data recieved (in bytes).
+	typedef void (*DataRecievedCallback)(Socket* self, HostID sender, void* data, size_t sz);
 	
 	///@brief Base class for low level socket communications.
 	class Socket
@@ -53,8 +60,8 @@ namespace rrdtp
 		///@brief Check whether this socket was opened in server mode or not.
 		virtual bool IsServer() = 0;
 
-		///@return The host ID of the socket.
-		virtual HostID GetHostID() = 0;
+		///@return The user data pointer set when the socket was created.
+		void* GetUserData() { return m_userPtr; }
 
 		///@brief Accepts the next incoming connection in the queue.
 		///@param errorCodeOut Optional error code out parameter.
@@ -63,15 +70,11 @@ namespace rrdtp
 		
 		///@brief Close the socket.
 		virtual void Close() = 0;
-		
-		///@brief Sends data from this socket without specifying a host to send to.
-		///This will only work on client sockets, because they recieve no socket ID when connecting to the server.
-		///@return The number of bytes actually sent.
-		virtual size_t Send(const void* data, size_t sz);
+
 		///@brief Sends data from this socket.
-		///@param host The remote host to send the data to.
+		///@param host The remote host to send the data to. This is only needed for server sockets and is ignored for clients.
 		///@return The number of bytes actually sent.
-		virtual size_t Send(HostID host, const void* data, size_t sz) = 0;
+		virtual size_t Send(const void* data, size_t sz, HostID host=-1) = 0;
 		
 		///@brief Polls the socket for incoming packets.
 		///This is where data should be recieved from the socket, and callbacks should be triggered.

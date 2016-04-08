@@ -3,14 +3,14 @@
 #include <iostream>
 #include <cassert>
 
-void dataRecieved(rrdtp::Socket* socket, rrdtp::HostID from, void* data, size_t dataSz)
+void dataRecieved(rrdtp::Socket* self, rrdtp::HostID sender, void* data, size_t dataSz)
 {
 	long val = *(long*)data;
 	std::cout << "Server recieved value: " << val << "\n";
 
 	val = 54321;
 	std::cout << "Server sending value back: " << val << "\n";
-	socket->Send(from, &val, sizeof(val));
+	self->Send(&val, sizeof(val), sender);
 }
 
 int main()

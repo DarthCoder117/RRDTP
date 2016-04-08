@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cassert>
 
-void dataRecieved(rrdtp::Socket* socket, rrdtp::HostID from, void* data, size_t dataSz)
+void dataRecieved(rrdtp::Socket* self, rrdtp::HostID sender, void* data, size_t sz)
 {
 	long val = *(long*)data;
 	std::cout << "Client recieved value: " << val << "\n";
