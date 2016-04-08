@@ -25,6 +25,8 @@ namespace rrdtp
 		
 		E_SOCKET_ERROR Listen(unsigned int port, E_SOCKET_PROTOCOL protocol);
 		
+		bool IsServer();
+
 		HostID GetHostID() { return m_socket; }
 
 		HostID Accept(E_SOCKET_ERROR* errorCodeOut = NULL);
@@ -40,6 +42,8 @@ namespace rrdtp
 		///@brief Handles Winsock initialization common between client and server sockets.
 		E_SOCKET_ERROR CommonInit(E_SOCKET_PROTOCOL protocol);
 		
+		bool m_isServer;
+
 		static WSADATA* m_wsaData;
 		SOCKET m_socket;
 

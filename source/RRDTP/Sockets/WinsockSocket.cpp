@@ -5,7 +5,8 @@
 using namespace rrdtp;
 
 WinsockSocket::WinsockSocket(DataRecievedCallback dataRecievedCallback, void* userPtr, ConnectionAcceptedCallback connectionAcceptedCallback)
-	:Socket(dataRecievedCallback, userPtr, connectionAcceptedCallback)
+	:Socket(dataRecievedCallback, userPtr, connectionAcceptedCallback),
+	m_isServer(false)
 {
 	
 }
@@ -69,6 +70,7 @@ E_SOCKET_ERROR WinsockSocket::Connect(const char* ip, unsigned int port, E_SOCKE
 		return ESE_FAILURE;
 	}
 	
+	m_isServer = false;
 	return ESE_SUCCESS;
 }
 
@@ -97,7 +99,13 @@ E_SOCKET_ERROR WinsockSocket::Listen(unsigned int port, E_SOCKET_PROTOCOL protoc
 		return ESE_FAILURE;
 	}
 	
+	m_isServer = true;
 	return ESE_SUCCESS;
+}
+
+bool WinsockSocket::IsServer()
+{
+	return m_isServer;
 }
 
 HostID WinsockSocket::Accept(E_SOCKET_ERROR* errorCodeOut)
@@ -145,7 +153,8 @@ void WinsockSocket::Poll()
 {
 	char data[2000];
 
-	if (m_connectedClients.size() == 0)
+	//Client just reads its own socket connection
+	if (!m_isServer)
 	{
 		int recievedDataSz = recv(m_socket, data, 2000, 0);
 		if (recievedDataSz != SOCKET_ERROR)
@@ -156,6 +165,7 @@ void WinsockSocket::Poll()
 			}
 		}
 	}
+	//Server has to accept incoming connections and read data from all connected client sockets
 	else
 	{
 		std::list<SOCKET>::iterator iter;

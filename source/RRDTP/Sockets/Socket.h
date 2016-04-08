@@ -50,6 +50,9 @@ namespace rrdtp
 		///@brief Opens socket in server mode and listens for incoming connections and incoming packets.
 		virtual E_SOCKET_ERROR Listen(unsigned int port, E_SOCKET_PROTOCOL protocol) = 0;
 		
+		///@brief Check whether this socket was opened in server mode or not.
+		virtual bool IsServer() = 0;
+
 		///@return The host ID of the socket.
 		virtual HostID GetHostID() = 0;
 
