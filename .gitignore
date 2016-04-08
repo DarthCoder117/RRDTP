@@ -29,3 +29,5 @@
 
 # Custom folders
 projects/*
+bin/*
+lib/*
