@@ -1,5 +1,4 @@
-#include "RRDTP.h"
-#include "RRDTP/Sockets/WinsockSocket.h"
+#include <RRDTP.h>
 #include <iostream>
 #include <cassert>
 
