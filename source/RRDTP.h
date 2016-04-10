@@ -4,5 +4,6 @@
 #include "RRDTP/Platform.h"
 #include "RRDTP/Types.h"
 #include "RRDTP/Sockets/Socket.h"
+#include "RRDTP/Connection.h"
 
 #endif

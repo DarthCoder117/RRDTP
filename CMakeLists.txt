@@ -22,6 +22,6 @@ add_executable(local-store-test "${PROJECT_SOURCE_DIR}/test/LocalStoreTest.cpp")
 target_link_libraries (local-store-test rrdtp-lib)
 
 add_executable(full-server-test "${PROJECT_SOURCE_DIR}/test/FullServerTest.cpp")
-target_link_libraries (server-socket-test rrdtp-lib)
+target_link_libraries (full-server-test rrdtp-lib)
 add_executable(full-client-test "${PROJECT_SOURCE_DIR}/test/FullClientTest.cpp")
-target_link_libraries (client-socket-test rrdtp-lib)
+target_link_libraries (full-client-test rrdtp-lib)

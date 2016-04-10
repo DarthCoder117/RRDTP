@@ -24,7 +24,7 @@ namespace rrdtp
 		EDT_STRING,///< string value
 		EDT_UNFORMATTED
 	};
-	
+
 	///@brief Every RRDTP packet contains a header describing the type of data contained in the packet.
 	struct PacketHeader
 	{

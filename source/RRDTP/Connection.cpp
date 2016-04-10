@@ -7,7 +7,7 @@ void dataRecieved(rrdtp::Socket* self, rrdtp::HostID sender, void* data, size_t 
 {
 	Connection* connection = (Connection*)self->GetUserData();
 
-
+	//TODO: Read recieved data
 }
 
 Connection::Connection()
@@ -67,7 +67,8 @@ void Connection::SetInt(const char* identifier, int val)
 
 int Connection::GetInt(const char* identifier, int defaultVal)
 {
-	return m_localDataStore.GetInt(identifier, defaultVal);
+	return 0;
+//	return m_localDataStore.GetInt(identifier, defaultVal);
 }
 
 void Connection::Poll()
