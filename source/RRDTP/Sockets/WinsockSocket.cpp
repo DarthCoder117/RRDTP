@@ -103,6 +103,10 @@ E_SOCKET_ERROR WinsockSocket::Listen(unsigned int port, E_SOCKET_PROTOCOL protoc
 		return ESE_FAILURE;
 	}
 	
+	//Make server non-blocking.
+	u_long iMode = 1;
+	ioctlsocket(m_socket, FIONBIO, &iMode);
+
 	m_isServer = true;
 	return ESE_SUCCESS;
 }
@@ -114,6 +118,8 @@ bool WinsockSocket::IsServer()
 
 HostID WinsockSocket::Accept(E_SOCKET_ERROR* errorCodeOut)
 {
+	//TODO: Make non-blocking.
+
 	SOCKET newSocket;
 	struct sockaddr_in client;
 	int c = sizeof(client);
@@ -145,11 +151,16 @@ HostID WinsockSocket::Accept(E_SOCKET_ERROR* errorCodeOut)
 
 void WinsockSocket::Close()
 {
-	std::list<SOCKET>::iterator iter;
-	for (iter = m_connectedClients.begin(); iter != m_connectedClients.end(); ++iter)
+	if (IsServer())
 	{
-		shutdown(*iter, SD_SEND);
-		closesocket(*iter);
+		std::list<SOCKET>::iterator iter;
+		for (iter = m_connectedClients.begin(); iter != m_connectedClients.end(); ++iter)
+		{
+			shutdown(*iter, SD_SEND);
+			closesocket(*iter);
+		}
+
+		m_connectedClients.clear();
 	}
 
 	shutdown(m_socket, SD_SEND);
@@ -174,6 +185,7 @@ void WinsockSocket::Poll()
 	//Server socket reads data from all connected client sockets
 	if (m_isServer)
 	{
+		//TODO: Make non-blocking.
 		std::list<SOCKET>::iterator iter;
 		for (iter = m_connectedClients.begin(); iter != m_connectedClients.end(); ++iter)
 		{
@@ -205,7 +217,8 @@ void WinsockSocket::Poll()
 			}
 			else
 			{
-				//Otherwise the client was disconnected, so trigger that callback.
+				//Otherwise the client was disconnected, so close it and trigger the disconnection callback.
+				Close();
 				//TODO: Disconnect callback.
 			}
 		}
