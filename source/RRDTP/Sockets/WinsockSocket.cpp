@@ -178,19 +178,55 @@ size_t WinsockSocket::Send(const void* data, size_t sz, HostID host)
 
 void WinsockSocket::Poll()
 {
-	if (m_socket == NULL)
+	if (m_socket != NULL)
 	{
-		return;
+		if (m_isServer)
+		{
+			PollServer();
+		}
+		else
+		{
+			PollClient();
+		}
 	}
+}
 
+void WinsockSocket::PollServer()
+{
 	char data[2000];
 
-	//Server socket reads data from all connected client sockets
-	if (m_isServer)
+	//Clear out the set before polling.
+	FD_ZERO(&m_readFDS);
+
+	//Add server socket to set
+	//FD_SET(m_socket, &m_readFDS);
+	
+	//Add client sockets
+	std::list<SOCKET>::iterator iter;
+	for (iter = m_connectedClients.begin(); iter != m_connectedClients.end(); ++iter)
 	{
+		FD_SET(*iter, &m_readFDS);
+	}
+
+	//Check to see if any sockets can be read from.
+	TIMEVAL timeout;
+	timeout.tv_sec = 0;
+	timeout.tv_usec = 0;
+
+	int numReady = select(0, &m_readFDS, NULL, NULL, &timeout);
+	if (numReady != SOCKET_ERROR && numReady > 0)
+	{
+		//Iterate over each client socket and check for I/O events.
 		std::list<SOCKET>::iterator iter = m_connectedClients.begin();
-		while(iter != m_connectedClients.end())
+		while (iter != m_connectedClients.end())
 		{
+			//If the fds isn't set then there's no I/O event on this socket and we can move on.
+			if (!FD_ISSET(*iter, &m_readFDS))
+			{
+				continue;
+			}
+
+			//Otherwise there's data to be recieved.
 			int recievedDataSz = recv(*iter, data, 2000, 0);
 
 			int lastError = WSAGetLastError();
@@ -207,7 +243,7 @@ void WinsockSocket::Poll()
 				}
 				else
 				{
-					//Otherwise the client was disconnected, so close it and trigger the disconnection callback.
+					//If we get here, then the client was disconnected, so close it and trigger the disconnection callback.
 					shutdown(*iter, SD_SEND);
 					closesocket(*iter);
 					iter = m_connectedClients.erase(iter);
@@ -217,29 +253,31 @@ void WinsockSocket::Poll()
 			}
 		}
 	}
-	//Client socket only needs to read from itself
-	else
-	{
-		int recievedDataSz = recv(m_socket, data, 2000, 0);
+}
 
-		int lastError = WSAGetLastError();
-		if (lastError != WSAEWOULDBLOCK)
+void WinsockSocket::PollClient()
+{
+	char data[2000];
+
+	int recievedDataSz = recv(m_socket, data, 2000, 0);
+
+	int lastError = WSAGetLastError();
+	if (lastError != WSAEWOULDBLOCK)
+	{
+		if (recievedDataSz != SOCKET_ERROR)
 		{
-			if (recievedDataSz != SOCKET_ERROR)
+			//Data was recieved, so trigger the callback.
+			if (m_dataRecievedCallback != NULL)
 			{
-				//Data was recieved, so trigger the callback.
-				if (m_dataRecievedCallback != NULL)
-				{
-					m_dataRecievedCallback(this, m_socket, (void*)data, recievedDataSz);
-				}
+				m_dataRecievedCallback(this, m_socket, (void*)data, recievedDataSz);
 			}
-			else
-			{
-				//Otherwise the server has disconnected, so close the socket and trigger the disconnection callback.
-				Close();
-				//TODO: Disconnect callback.
-				printf("Server disconnected.\n");
-			}
+		}
+		else
+		{
+			//Otherwise the server has disconnected, so close the socket and trigger the disconnection callback.
+			Close();
+			//TODO: Disconnect callback.
+			printf("Server disconnected.\n");
 		}
 	}
 }

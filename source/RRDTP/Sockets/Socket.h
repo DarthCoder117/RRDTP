@@ -66,6 +66,7 @@ namespace rrdtp
 		///@brief Accepts the next incoming connection in the queue.
 		///@param errorCodeOut Optional error code out parameter.
 		///@return Returns an ID to refer to the accepted connection, or returns -1 if an error occurred.
+		///@deprecated This will be handled by the server socket in the Poll method...
 		virtual HostID Accept(E_SOCKET_ERROR* errorCodeOut=NULL) = 0;
 		
 		///@brief Close the socket.
