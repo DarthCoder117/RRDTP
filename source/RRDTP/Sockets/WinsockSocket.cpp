@@ -69,6 +69,10 @@ E_SOCKET_ERROR WinsockSocket::Connect(const char* ip, unsigned int port, E_SOCKE
     {
 		return ESE_FAILURE;
 	}
+
+	//Set to non-blocking mode
+	u_long iMode = 1;
+	ioctlsocket(m_socket, FIONBIO, &iMode);
 	
 	m_isServer = false;
 	return ESE_SUCCESS;
@@ -144,9 +148,11 @@ void WinsockSocket::Close()
 	std::list<SOCKET>::iterator iter;
 	for (iter = m_connectedClients.begin(); iter != m_connectedClients.end(); ++iter)
 	{
+		shutdown(*iter, SD_SEND);
 		closesocket(*iter);
 	}
 
+	shutdown(m_socket, SD_SEND);
 	closesocket(m_socket);
 	m_socket = NULL;
 }
@@ -185,11 +191,22 @@ void WinsockSocket::Poll()
 	else
 	{
 		int recievedDataSz = recv(m_socket, data, 2000, 0);
-		if (recievedDataSz != SOCKET_ERROR)
+
+		int lastError = WSAGetLastError();
+		if (lastError != WSAEWOULDBLOCK)
 		{
-			if (m_dataRecievedCallback != NULL)
+			if (recievedDataSz != SOCKET_ERROR)
 			{
-				m_dataRecievedCallback(this, m_socket, (void*)data, recievedDataSz);
+				//Data was recieved, so trigger the callback.
+				if (m_dataRecievedCallback != NULL)
+				{
+					m_dataRecievedCallback(this, m_socket, (void*)data, recievedDataSz);
+				}
+			}
+			else
+			{
+				//Otherwise the client was disconnected, so trigger that callback.
+				//TODO: Disconnect callback.
 			}
 		}
 	}
