@@ -118,8 +118,6 @@ bool WinsockSocket::IsServer()
 
 HostID WinsockSocket::Accept(E_SOCKET_ERROR* errorCodeOut)
 {
-	//TODO: Make non-blocking.
-
 	SOCKET newSocket;
 	struct sockaddr_in client;
 	int c = sizeof(client);
@@ -180,21 +178,41 @@ size_t WinsockSocket::Send(const void* data, size_t sz, HostID host)
 
 void WinsockSocket::Poll()
 {
+	if (m_socket == NULL)
+	{
+		return;
+	}
+
 	char data[2000];
 
 	//Server socket reads data from all connected client sockets
 	if (m_isServer)
 	{
-		//TODO: Make non-blocking.
-		std::list<SOCKET>::iterator iter;
-		for (iter = m_connectedClients.begin(); iter != m_connectedClients.end(); ++iter)
+		std::list<SOCKET>::iterator iter = m_connectedClients.begin();
+		while(iter != m_connectedClients.end())
 		{
 			int recievedDataSz = recv(*iter, data, 2000, 0);
-			if (recievedDataSz != SOCKET_ERROR)
+
+			int lastError = WSAGetLastError();
+			if (lastError != WSAEWOULDBLOCK)
 			{
-				if (m_dataRecievedCallback != NULL)
+				if (recievedDataSz != SOCKET_ERROR)
 				{
-					m_dataRecievedCallback(this, *iter, (void*)data, recievedDataSz);
+					if (m_dataRecievedCallback != NULL)
+					{
+						m_dataRecievedCallback(this, *iter, (void*)data, recievedDataSz);
+					}
+
+					++iter;
+				}
+				else
+				{
+					//Otherwise the client was disconnected, so close it and trigger the disconnection callback.
+					shutdown(*iter, SD_SEND);
+					closesocket(*iter);
+					iter = m_connectedClients.erase(iter);
+					//TODO: Disconnect callback.
+					printf("Client disconnected.\n");
 				}
 			}
 		}
@@ -217,9 +235,10 @@ void WinsockSocket::Poll()
 			}
 			else
 			{
-				//Otherwise the client was disconnected, so close it and trigger the disconnection callback.
+				//Otherwise the server has disconnected, so close the socket and trigger the disconnection callback.
 				Close();
 				//TODO: Disconnect callback.
+				printf("Server disconnected.\n");
 			}
 		}
 	}

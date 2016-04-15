@@ -34,9 +34,11 @@ int main()
 	
 	while (true)
 	{
-		//Accept connection on server
-		serverSocket->Accept();
-		std::cout << "Server accepted connection.\n";
+		//Accept connections on server
+		if (serverSocket->Accept() != -1)
+		{
+			std::cout << "Server accepted connection.\n";
+		}
 
 		serverSocket->Poll();
 	}
