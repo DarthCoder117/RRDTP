@@ -3,14 +3,16 @@
 
 int main()
 {
+	std::cout << "RRDTP Client test.\n\n";
+
 	rrdtp::Connection client;
 	client.StartClient("127.0.0.1");
-
-	std::cout << "RRDTP Client test.\n\n";
 
 	int oldVal = 0;
 	while (true)
 	{
+		client.Poll();
+
 		int newVal = client.GetInt("test-val");
 		if (newVal != oldVal)
 		{

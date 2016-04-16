@@ -1,5 +1,11 @@
 #include "RRDTP/Connection.h"
+#include "RRDTP/Platform.h"
+#include "RRDTP/DataBuffer.h"
 #include <sstream>
+#include <cinttypes>
+#ifdef RRDTP_PLATFORM_WINDOWS
+#include <Winsock2.h>
+#endif
 
 using namespace rrdtp;
 
@@ -7,7 +13,45 @@ void dataRecieved(rrdtp::Socket* self, rrdtp::HostID sender, void* data, size_t 
 {
 	Connection* connection = (Connection*)self->GetUserData();
 
-	//TODO: Read recieved data
+	if (data != NULL && dataSz > 0)
+	{
+		DataBuffer buffer((unsigned char*)data, dataSz);
+
+		//Protocol version and event type are common to all packets.
+		char protocolVersion = 0;
+		buffer.Read<char>(protocolVersion);
+
+		char eventType = 0;
+		buffer.Read<char>(eventType);
+
+		//Depending on the event type, different packets may have different contents.
+		if (eventType == EET_VALUE_UPDATE)
+		{
+			//Length of value identifier
+			char identifierLength = 0;
+			buffer.Read<char>(identifierLength);
+
+			//Value identifier string.
+			char identifier[255];
+			buffer.Read((unsigned char*)identifier, identifierLength);
+			identifier[identifierLength] = '\0';
+
+			//Data type
+			char dataType = 0;
+			buffer.Read<char>(dataType);
+
+			//Size of data
+			short dataSz = 0;
+			buffer.Read<short>(dataSz);
+			dataSz = ntohs(dataSz);
+
+			//Actual data...
+
+			printf("Value update recieved.\n");
+
+			delete[] identifier;
+		}	
+	}
 }
 
 Connection::Connection()
@@ -36,7 +80,41 @@ void Connection::StartClient(const char* ip, unsigned int port)
 {
 	if (m_socket != NULL)
 	{
-		m_socket->Connect(ip, port, ESP_TCP);
+		if (m_socket->Connect(ip, port, ESP_TCP) == ESE_SUCCESS)
+		{
+			printf("Connected to server.\n");
+		}
+	}
+}
+
+void Connection::SendUpdatePacket(E_DATA_TYPE type, const char* identifier, const unsigned char* data, short dataSz)
+{
+	if (m_socket != NULL && identifier != NULL && data != NULL && dataSz > 0)
+	{	
+		int identifierLength = strlen(identifier);
+		if (identifierLength >= 255)
+		{
+			return;
+		}
+
+		unsigned char* packetData = new unsigned char[512];
+		DataBuffer buffer(packetData, 512);
+
+		buffer.Write<char>(1);//Protocol version
+		buffer.Write<char>(EET_VALUE_UPDATE);//Event type
+
+		buffer.Write<char>((char)identifierLength);//Value identifier length
+		buffer.Write((const unsigned char*)identifier, identifierLength);//Value identifier
+
+		buffer.Write<char>((char)type);//Data type
+		buffer.Write<short>(htons(dataSz));//Size of data
+
+		buffer.Write(data, dataSz);//Write the actual data. Conversion to network byte order should have been done already.
+
+		//Send update packet to all connected clients.
+		m_socket->SendAll(packetData, buffer.GetPosition());
+
+		delete[] packetData;
 	}
 }
 
@@ -44,38 +122,30 @@ void Connection::SetInt(const char* identifier, int val)
 {
 	if (m_socket != NULL)
 	{
-		/*PacketHeader header;
-		header.m_eventType = htonl(EET_VALUE_UPDATE);
+		int value = htonl(val);
+		SendUpdatePacket(EDT_INT, identifier, (const unsigned char*)&value, sizeof(int));
 
-		std::stringstream s;
-		s.write((const char*)&header, sizeof(header));//Write header
-		s << identifier;//Write value identifier
-		s.write()
-
-		if (m_socket->IsServer())
-		{
-			//TODO: Send value to all connected clients
-		}
-		else
-		{
-			//TODO: Send value to server
-		}
-
-		m_localDataStore.SetInt(identifier, val);*/
+		//TODO: Store value locally
 	}
 }
 
 int Connection::GetInt(const char* identifier, int defaultVal)
 {
 	return 0;
-//	return m_localDataStore.GetInt(identifier, defaultVal);
 }
 
 void Connection::Poll()
 {
 	if (m_socket != NULL)
 	{
-		m_socket->Accept();
+		if (m_socket->IsServer())
+		{
+			if (m_socket->Accept() != -1)
+			{
+				printf("Accepted connection.\n");
+			}
+		}
+
 		m_socket->Poll();
 	}
 }

@@ -28,10 +28,6 @@ namespace rrdtp
 	///@brief Every RRDTP packet contains a header describing the type of data contained in the packet.
 	struct PacketHeader
 	{
-		PacketHeader()
-			:m_protocolVersion(RRDTP_VERSION)
-		{}
-
 		unsigned m_protocolVersion : 4;///< First 4 bits is protocol version. This will just be 1 for the initial version of the protocol.
 
 		E_EVENT_TYPE m_eventType : 4;///< The rest of the packet definition depends on the event type. Event type is 4 bits also, because having more than 16 event types is unlikely at this stage.

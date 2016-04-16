@@ -176,6 +176,22 @@ size_t WinsockSocket::Send(const void* data, size_t sz, HostID host)
 	return send(m_socket, (const char*)data, sz, 0);
 }
 
+void WinsockSocket::SendAll(const void* data, size_t sz)
+{
+	if (m_isServer)//The server needs a host ID specified to send the data to.
+	{
+		std::list<SOCKET>::iterator iter;
+		for (iter = m_connectedClients.begin(); iter != m_connectedClients.end(); ++iter)
+		{
+			send(*iter, (const char*)data, sz, 0);
+		}
+	}
+	else
+	{
+		send(m_socket, (const char*)data, sz, 0);
+	}
+}
+
 void WinsockSocket::Poll()
 {
 	if (m_socket != NULL)
@@ -259,25 +275,39 @@ void WinsockSocket::PollClient()
 {
 	char data[2000];
 
-	int recievedDataSz = recv(m_socket, data, 2000, 0);
+	//Clear out the set before polling.
+	FD_ZERO(&m_readFDS);
 
-	int lastError = WSAGetLastError();
-	if (lastError != WSAEWOULDBLOCK)
+	//Add socket to set
+	FD_SET(m_socket, &m_readFDS);
+
+	TIMEVAL timeout;
+	timeout.tv_sec = 0;
+	timeout.tv_usec = 0;
+
+	int numReady = select(0, &m_readFDS, NULL, NULL, &timeout);
+	if (numReady != SOCKET_ERROR && numReady > 0)
 	{
-		if (recievedDataSz != SOCKET_ERROR)
+		int recievedDataSz = recv(m_socket, data, 2000, 0);
+
+		int lastError = WSAGetLastError();
+		if (lastError != WSAEWOULDBLOCK)
 		{
-			//Data was recieved, so trigger the callback.
-			if (m_dataRecievedCallback != NULL)
+			if (recievedDataSz != SOCKET_ERROR)
 			{
-				m_dataRecievedCallback(this, m_socket, (void*)data, recievedDataSz);
+				//Data was recieved, so trigger the callback.
+				if (m_dataRecievedCallback != NULL)
+				{
+					m_dataRecievedCallback(this, m_socket, (void*)data, recievedDataSz);
+				}
 			}
-		}
-		else
-		{
-			//Otherwise the server has disconnected, so close the socket and trigger the disconnection callback.
-			Close();
-			//TODO: Disconnect callback.
-			printf("Server disconnected.\n");
+			else
+			{
+				//Otherwise the server has disconnected, so close the socket and trigger the disconnection callback.
+				Close();
+				//TODO: Disconnect callback.
+				printf("Server disconnected.\n");
+			}
 		}
 	}
 }

@@ -37,6 +37,13 @@ namespace rrdtp
 
 	private:
 
+		///@brief Sends a value update packet.
+		///@param type The data type of the value (packet will be ignored by the server if this is inconsistent).
+		///@param identifier The value identifier to update.
+		///@param data The data itself. This should be converted to network byte order already.
+		///@param dataSz The size of the data (in bytes)
+		void SendUpdatePacket(E_DATA_TYPE type, const char* identifier, const unsigned char* data, short dataSz);
+
 		Socket* m_socket;
 
 		LocalStore m_localDataStore;

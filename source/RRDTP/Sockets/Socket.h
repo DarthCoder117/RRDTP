@@ -77,6 +77,9 @@ namespace rrdtp
 		///@return The number of bytes actually sent.
 		virtual size_t Send(const void* data, size_t sz, HostID host=-1) = 0;
 		
+		///@brief Sends data to all connected clients (or just sends to the server if this is a client socket).
+		virtual void SendAll(const void* data, size_t sz) = 0;
+
 		///@brief Polls the socket for incoming packets.
 		///This is where data should be recieved from the socket, and callbacks should be triggered.
 		virtual void Poll() = 0;
