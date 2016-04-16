@@ -9,7 +9,7 @@
 
 using namespace rrdtp;
 
-void dataRecieved(rrdtp::Socket* self, rrdtp::HostID sender, void* data, size_t dataSz)
+void Connection::dataRecieved(Socket* self, HostID sender, void* data, size_t dataSz)
 {
 	Connection* connection = (Connection*)self->GetUserData();
 
@@ -25,7 +25,7 @@ void dataRecieved(rrdtp::Socket* self, rrdtp::HostID sender, void* data, size_t 
 		buffer.Read<char>(eventType);
 
 		//Depending on the event type, different packets may have different contents.
-		if (eventType == EET_VALUE_UPDATE)
+		if (eventType == EET_UPDATE || eventType == EET_CREATE)
 		{
 			//Length of value identifier
 			char identifierLength = 0;
@@ -45,7 +45,16 @@ void dataRecieved(rrdtp::Socket* self, rrdtp::HostID sender, void* data, size_t 
 			buffer.Read<short>(dataSz);
 			dataSz = ntohs(dataSz);
 
-			//Actual data...
+			//TODO: Actual data...
+
+			if (eventType == EET_CREATE)
+			{
+				//connection->m_localDataStore.Create(identifier, dataType, );
+			}
+			else
+			{
+				//connection->m_localDataStore.Update(identifier, dataType, );
+			}
 
 			printf("Value update recieved.\n");
 
@@ -54,10 +63,26 @@ void dataRecieved(rrdtp::Socket* self, rrdtp::HostID sender, void* data, size_t 
 	}
 }
 
+void Connection::clientConnected(Socket* self, HostID client)
+{
+	Connection* connection = (Connection*)self->GetUserData();
+
+	//Once connected to the server, send it the client handshake packet.
+	unsigned char packetData[2];
+	DataBuffer buffer(packetData, 2);
+
+	buffer.Write<char>(1);//Protocol version
+	buffer.Write<char>(EET_SERVER_HANDSHAKE);//Event type
+
+	self->Send(packetData, 2);
+
+	//TODO: Iterate through all values in local store and create them on the newly connected client.
+}
+
 Connection::Connection()
 	:m_socket(NULL)
 {
-	m_socket = Socket::Create(&dataRecieved, this);
+	m_socket = Socket::Create(&Connection::dataRecieved, this, &Connection::clientConnected);
 }
 
 Connection::~Connection()
@@ -76,15 +101,28 @@ void Connection::StartServer(unsigned int port)
 	}
 }
 
-void Connection::StartClient(const char* ip, unsigned int port)
+bool Connection::StartClient(const char* ip, unsigned int port)
 {
 	if (m_socket != NULL)
 	{
 		if (m_socket->Connect(ip, port, ESP_TCP) == ESE_SUCCESS)
 		{
 			printf("Connected to server.\n");
+
+			//Once connected to the server, send it the client handshake packet.
+			unsigned char packetData[2];
+			DataBuffer buffer(packetData, 2);
+
+			buffer.Write<char>(1);//Protocol version
+			buffer.Write<char>(EET_CLIENT_HANDSHAKE);//Event type
+
+			m_socket->Send(packetData, 2);
+
+			return true;
 		}
 	}
+
+	return false;
 }
 
 void Connection::SendUpdatePacket(E_DATA_TYPE type, const char* identifier, const unsigned char* data, short dataSz)
@@ -101,7 +139,7 @@ void Connection::SendUpdatePacket(E_DATA_TYPE type, const char* identifier, cons
 		DataBuffer buffer(packetData, 512);
 
 		buffer.Write<char>(1);//Protocol version
-		buffer.Write<char>(EET_VALUE_UPDATE);//Event type
+		buffer.Write<char>(EET_UPDATE);//Event type
 
 		buffer.Write<char>((char)identifierLength);//Value identifier length
 		buffer.Write((const unsigned char*)identifier, identifierLength);//Value identifier

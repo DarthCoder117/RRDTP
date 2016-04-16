@@ -8,9 +8,10 @@ namespace rrdtp
 	///@brief Enum identifying the type of event a packet represents.
 	enum E_EVENT_TYPE
 	{
-		EET_SUBSCRIBE,///< A client wants to subscribe to a named value.
-		EET_UNSUBSCRIBE,///< A client doesn't want to be subscribed to a value anymore.
-		EET_VALUE_UPDATE///< The packet contains an updated data value.
+		EET_CLIENT_HANDSHAKE,///< Sent to the server once when first connecting.
+		EET_SERVER_HANDSHAKE,///< Sent by the server once when a connection is first recieved.
+		EET_CREATE,///< Create a named value on the server or a client.
+		EET_UPDATE///< Update data on the server or a client.
 	};
 
 	///@brief Enum identifying the type of data to be sent in a data packet.
@@ -23,14 +24,6 @@ namespace rrdtp
 		EDT_BOOLEAN,///< true/false boolean flag
 		EDT_STRING,///< string value
 		EDT_UNFORMATTED
-	};
-
-	///@brief Every RRDTP packet contains a header describing the type of data contained in the packet.
-	struct PacketHeader
-	{
-		unsigned m_protocolVersion : 4;///< First 4 bits is protocol version. This will just be 1 for the initial version of the protocol.
-
-		E_EVENT_TYPE m_eventType : 4;///< The rest of the packet definition depends on the event type. Event type is 4 bits also, because having more than 16 event types is unlikely at this stage.
 	};
 }
 

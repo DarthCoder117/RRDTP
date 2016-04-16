@@ -19,7 +19,8 @@ namespace rrdtp
 		void StartServer(unsigned int port=4309);
 
 		///@brief Starts an RRDTP client connection.
-		void StartClient(const char* ip, unsigned int port = 4309);
+		///@return True if the connection attempt was successful. False if the connection failed.
+		bool StartClient(const char* ip, unsigned int port = 4309);
 
 		///@brief Set a 32-bit integer value to be sent to all subscribed systems (client or server).
 		///@param identifier A valid value identifier.
@@ -36,6 +37,10 @@ namespace rrdtp
 		void Poll();
 
 	private:
+
+		static void dataRecieved(Socket* self, HostID sender, void* data, size_t dataSz);
+
+		static void clientConnected(Socket* self, HostID client);
 
 		///@brief Sends a value update packet.
 		///@param type The data type of the value (packet will be ignored by the server if this is inconsistent).
