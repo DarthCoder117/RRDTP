@@ -1,53 +1,146 @@
 #include "RRDTP/LocalStore.h"
+#include <cassert>
 
 using namespace rrdtp;
 
-DataEntry* LocalStore::FindOrCreate(const char* identifier, E_DATA_TYPE type)
+Entry::Entry(HostID owner, const char* name, E_DATA_TYPE type)
+	:m_owner(owner),
+	m_name(name),
+	m_type(type),
+	m_size(0),
+	m_data(0)
+{}
+
+Entry::~Entry()
 {
-	CategoryEntry* e = &m_rootEntry;
-	DataEntry* result = NULL;
-
-	//Tokenize string and search through the tree until the identifier is found.
-	char* identifierCpy = _strdup(identifier);
-	char* pch = strtok(identifierCpy, ".");
-	while (pch != NULL)//For each token
+	if (m_size > sizeof(size_t) && m_data != 0)
 	{
-		char* currentPch = pch;
-		pch = strtok(NULL, ".");
+		delete[](unsigned char*)m_data;
+		m_data = 0;
+	}
+}
 
-		//Try and find the child with that name.
-		Entry* child = e->FindChild(currentPch);
-		if (child != 0)
+void Entry::SetString(const char* str)
+{
+	assert(str);
+
+	size_t sz = strlen(str)*sizeof(char);
+	Reallocate(sz);
+
+	memcpy((void*)m_data, str, sz);
+	m_size = sz;
+}
+
+void Entry::Reallocate(size_t sz)
+{
+	if (m_size < sz)
+	{
+		//Free memory if it has been allocated already
+		if (m_size != 0 && m_data != 0)
 		{
-			//Traverse into subcategory if needed.
-			if (child->IsCategory())
-			{
-				e = (CategoryEntry*)child;
-			}
-			else
-			{
-				result = (DataEntry*)child;
-			}
+			delete[](unsigned char*)m_data;
+			m_data = 0;
 		}
-		//If the child doesn't exist, then create it
-		else
+
+		m_data = (size_t) new unsigned char[sz];
+	}
+}
+
+Category::~Category()
+{
+	for (std::list<Category*>::iterator iter = m_subcategories.begin(); iter != m_subcategories.end(); ++iter)
+	{
+		delete *iter;
+	}
+
+	m_subcategories.clear();
+
+	for (std::list<Entry*>::iterator iter = m_entries.begin(); iter != m_entries.end(); ++iter)
+	{
+		delete *iter;
+	}
+
+	m_subcategories.clear();
+}
+
+Category* Category::CreateSubcategory(const char* name)
+{
+	//Check for existing category first.
+	Category* ret = GetSubcategory(name);
+
+	//If it doesn't exist, then create it.
+	if (ret == NULL)
+	{
+		ret = new Category(name);
+		m_subcategories.push_back(ret);
+	}
+
+	return ret;
+}
+
+Category* Category::GetSubcategory(const char* name)
+{
+	std::list<Category*>::iterator iter;
+	for (iter = m_subcategories.begin(); iter != m_subcategories.end(); ++iter)
+	{
+		if (strcmp((*iter)->m_name, name) == 0)
 		{
-			if (pch == NULL)//If pch is NULL then that means we've reached the end of the categories and can add the data entry.
-			{
-				result = new DataEntry(currentPch, type);
-				if (!e->Add(result))
-				{
-					return NULL;
-				}
-			}
-			else//Otherwise another category will be needed.
-			{
-				CategoryEntry* newCategory = new CategoryEntry(currentPch);
-				e->Add(newCategory);
-				e = newCategory;
-			}
+			return *iter;
 		}
 	}
 
-	return result;
+	return NULL;
+}
+
+Entry* Category::CreateEntry(HostID owner, const char* name, E_DATA_TYPE type)
+{
+	//Check for existing entry first.
+	Entry* ret = GetEntry(name, type);
+
+	//If it doesn't exist, then create it.
+	if (ret == NULL)
+	{
+		ret = new Entry(owner, name, type);
+		m_entries.push_back(ret);
+	}
+
+	return ret;
+}
+
+Entry* Category::GetEntry(const char* name)
+{
+	std::list<Entry*>::iterator iter;
+	for (iter = m_entries.begin(); iter != m_entries.end(); ++iter)
+	{
+		if (strcmp((*iter)->GetName(), name) == 0)
+		{
+			return *iter;
+		}
+	}
+
+	return NULL;
+}
+
+Entry* Category::GetEntry(const char* name, E_DATA_TYPE type)
+{
+	std::list<Entry*>::iterator iter;
+	for (iter = m_entries.begin(); iter != m_entries.end(); ++iter)
+	{
+		if (strcmp((*iter)->GetName(), name) == 0 && (*iter)->GetType() == type)
+		{
+			return *iter;
+		}
+	}
+
+	return NULL;
+}
+
+Entry* LocalStore::Create(HostID owner, const char* identifier, E_DATA_TYPE type)
+{
+	//TODO: parse identifier and create categories and entry.
+}
+
+Entry* LocalStore::Get(const char* identifier)
+{
+	//TODO: parse identifier and find entry.
 }
