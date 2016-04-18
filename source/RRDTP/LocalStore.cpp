@@ -143,6 +143,7 @@ Entry* LocalStore::Create(HostID owner, const char* identifier, E_DATA_TYPE type
 	}
 
 	Category* category = &m_rootCategory;
+	Entry* entry = NULL;
 
 	//Create copy of string to tokenize.
 	char* identifierCopy = strdup(identifier);
@@ -163,17 +164,50 @@ Entry* LocalStore::Create(HostID owner, const char* identifier, E_DATA_TYPE type
 		//Otherwise we've reached the value and can create it.
 		else
 		{
-			//TODO: Create value...
+			entry = category->CreateEntry(owner, token, type);
 		}
 
 		//Next token becomes current token for next loop iteration.
 		token = nextToken;
 	}
 
-	//TODO: parse identifier and create categories and entry.
+	return entry;
 }
 
 Entry* LocalStore::Get(const char* identifier)
 {
-	//TODO: parse identifier and find entry.
+	if (identifier == NULL)
+	{
+		return NULL;
+	}
+
+	Category* category = &m_rootCategory;
+	Entry* entry = NULL;
+
+	char* identifierCopy = strdup(identifier);
+
+	//Loop over tokens
+	char* nextToken = NULL;
+	char* token = strtok(identifierCopy, ".");
+	while (token != NULL)
+	{
+		//The next token is retrieved first so that we know which one is the last one.
+		nextToken = strtok(NULL, ".");
+
+		//If we haven't reached the last token, then the current one is a category.
+		if (nextToken != NULL)
+		{
+			category = category->GetSubcategory(token);
+		}
+		//Otherwise we've reached the value.
+		else
+		{
+			entry = category->GetEntry(token);
+		}
+
+		//Next token becomes current token for next loop iteration.
+		token = nextToken;
+	}
+
+	return entry;
 }
