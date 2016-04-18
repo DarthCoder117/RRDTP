@@ -137,6 +137,39 @@ Entry* Category::GetEntry(const char* name, E_DATA_TYPE type)
 
 Entry* LocalStore::Create(HostID owner, const char* identifier, E_DATA_TYPE type)
 {
+	if (identifier == NULL)
+	{
+		return NULL;
+	}
+
+	Category* category = &m_rootCategory;
+
+	//Create copy of string to tokenize.
+	char* identifierCopy = strdup(identifier);
+
+	//Loop over tokens
+	char* nextToken = NULL;
+	char* token = strtok(identifierCopy, ".");
+	while (token != NULL)
+	{
+		//The next token is retrieved first so that we know which one is the last one.
+		nextToken = strtok(NULL, ".");
+
+		//If we haven't reached the last token, then the current one is a category.
+		if (nextToken != NULL)
+		{
+			category = category->CreateSubcategory(token);//Get or create the new category
+		}
+		//Otherwise we've reached the value and can create it.
+		else
+		{
+			//TODO: Create value...
+		}
+
+		//Next token becomes current token for next loop iteration.
+		token = nextToken;
+	}
+
 	//TODO: parse identifier and create categories and entry.
 }
 
