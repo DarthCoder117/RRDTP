@@ -43,6 +43,13 @@ namespace rrdtp
 		///@brief Set the entry to a string value.
 		void SetString(const char* str);
 
+		///@brief Set the entry to a value (fixed size types)
+		template <typename T>
+		T Get()
+		{
+			//TODO: Implement this...
+		}
+
 	private:
 
 		Entry(const Entry& oth) {}

@@ -160,16 +160,34 @@ void Connection::SetInt(const char* identifier, int val)
 {
 	if (m_socket != NULL)
 	{
-		int value = htonl(val);
-		SendUpdatePacket(EDT_INT, identifier, (const unsigned char*)&value, sizeof(int));
+		//Create/retrieve entry
+		Entry* entry = m_localDataStore.Create(-1, identifier, EDT_INT);
+		if (entry != NULL)
+		{
+			//Update the entry
+			entry->Set<int>(val);
 
-		//TODO: Store value locally
+			//Send the update packet
+			int value = htonl(val);
+			SendUpdatePacket(EDT_INT, identifier, (const unsigned char*)&value, sizeof(int));
+		}
 	}
 }
 
 int Connection::GetInt(const char* identifier, int defaultVal)
 {
-	return 0;
+	if (m_socket != NULL)
+	{
+		//Retrieve entry
+		Entry* entry = m_localDataStore.Get(identifier);
+		if (entry != NULL && entry->GetType() == EDT_INT)
+		{
+			//Update the entry
+			return entry->Get<int>();
+		}
+	}
+
+	return defaultVal;
 }
 
 void Connection::Poll()

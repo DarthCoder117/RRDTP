@@ -35,7 +35,6 @@ int main()
 	assert(actuallySent == sizeof(val));
 
 	//Poll for recieved messages on the server.
-	//This will usually be done in a loop, but this socket test program is only for testing the socket code.
 	while (true)
 	{
 		clientSocket->Poll();
