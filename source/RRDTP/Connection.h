@@ -33,6 +33,28 @@ namespace rrdtp
 		///@return The retrieved value.
 		int GetInt(const char* identifier, int defaultVal = 0);
 
+		///@brief Set a 64-bit integer value to be sent to all subscribed systems (client or server).
+		///@param identifier A valid value identifier.
+		///@param val The value to set.
+		void SetLong(const char* identifier, long val);
+		///@brief Get the most recent 64-bit integer value with the specified identifer (client or server).
+		///If this is a client, then the client must either own the value, or be subscribed to it for this method to work.
+		///@param identifier A valid value identifier.
+		///@param defaultVal The default value that will be returned if the identified value was not found.
+		///@return The retrieved value.
+		long GetLong(const char* identifier, long defaultVal = 0);
+
+		///@brief Set a boolean value to be sent to all subscribed systems (client or server).
+		///@param identifier A valid value identifier.
+		///@param val The value to set.
+		void SetBool(const char* identifier, bool val);
+		///@brief Get the most recent boolean value with the specified identifer (client or server).
+		///If this is a client, then the client must either own the value, or be subscribed to it for this method to work.
+		///@param identifier A valid value identifier.
+		///@param defaultVal The default value that will be returned if the identified value was not found.
+		///@return The retrieved value.
+		bool GetBool(const char* identifier, bool defaultVal = false);
+
 		///@brief Called periodically to check for new values and update the local data store with new ones.
 		void Poll();
 

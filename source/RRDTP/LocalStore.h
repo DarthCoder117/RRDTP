@@ -34,10 +34,25 @@ namespace rrdtp
 			{
 				Reallocate(sizeof(T));
 
-				((T*)m_data) = val;
+				*((T*)m_data) = val;
 			}
 
 			m_size = sizeof(T);
+		}
+
+		///@brief Sets the entry to a value directly.
+		void Set(unsigned char* data, size_t sz)
+		{
+			if (sz <= sizeof(size_t))//Small data gets stored in m_data
+			{
+				memcpy((void*)&m_data, data, sz);
+			}
+			else//Large data has to be dynamically allocated...
+			{
+				Reallocate(sz);
+
+				memcpy((void*)m_data, data, sz);
+			}
 		}
 
 		///@brief Set the entry to a string value.
@@ -47,7 +62,16 @@ namespace rrdtp
 		template <typename T>
 		T Get()
 		{
-			//TODO: Implement this...
+			if (sizeof(T) <= sizeof(size_t))//Small data
+			{
+				return *((T*)&m_data);
+			}
+			else//Large data
+			{
+				Reallocate(sizeof(T));
+
+				return *((T*)m_data);
+			}
 		}
 
 	private:
