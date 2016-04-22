@@ -58,6 +58,10 @@ namespace rrdtp
 		///@brief Set the entry to a string value.
 		void SetString(const char* str);
 
+		///@brief Get the entry as a string value.
+		///The calling code is responsible for delete[]ing the string.
+		const char* GetString();
+
 		///@brief Set the entry to a value (fixed size types)
 		template <typename T>
 		T Get()

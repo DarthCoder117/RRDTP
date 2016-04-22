@@ -6,6 +6,12 @@
 
 namespace rrdtp
 {
+	class Connection;
+	class Entry;
+
+	///@brief Callback for whenever a value is set.
+	typedef void(*ValueSetCallback)(Connection* connection, Entry* entry);
+
 	///@brief Manages an RRDTP connection.
 	class Connection
 	{
@@ -55,8 +61,22 @@ namespace rrdtp
 		///@return The retrieved value.
 		bool GetBool(const char* identifier, bool defaultVal = false);
 
+		///@brief Set a string value to be sent to all subscribed systems (client or server).
+		///@param identifier A valid value identifier.
+		///@param val The value to set.
+		void SetString(const char* identifier, const char* str);
+		///@brief Get the most recent string value with the specified identifer (client or server).
+		///If this is a client, then the client must either own the value, or be subscribed to it for this method to work.
+		///@param identifier A valid value identifier.
+		///@param defaultVal The default value that will be returned if the identified value was not found.
+		///@return A pointer to a copy of the retrieved value. The caller is responsible for ensuring that delete[] is called when finished with the value.
+		const char* GetString(const char* identifier, const char* defaultVal = "");
+
 		///@brief Called periodically to check for new values and update the local data store with new ones.
 		void Poll();
+
+		///@brief Sets the callback that will be used when a value is changed.
+		void SetValueSetCallback(ValueSetCallback callback) { m_valueSetCallback = callback; }
 
 	private:
 
@@ -74,6 +94,8 @@ namespace rrdtp
 		Socket* m_socket;
 
 		LocalStore m_localDataStore;
+
+		ValueSetCallback m_valueSetCallback;
 	};
 }
 

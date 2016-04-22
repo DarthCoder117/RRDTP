@@ -31,6 +31,13 @@ void Entry::SetString(const char* str)
 	m_size = sz;
 }
 
+const char* Entry::GetString()
+{
+	const char* newStr = new char[m_size];
+	memcpy((void*)newStr, (void*)m_data, m_size);
+	return newStr;
+}
+
 void Entry::Reallocate(size_t sz)
 {
 	if (m_size < sz)

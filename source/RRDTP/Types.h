@@ -10,7 +10,7 @@ namespace rrdtp
 	{
 		EET_CLIENT_HANDSHAKE,///< Sent to the server once when first connecting.
 		EET_SERVER_HANDSHAKE,///< Sent by the server once when a connection is first recieved.
-		EET_CREATE,///< Create a named value on the server or a client.
+		EET_SET,///< Create a named value on the server or a client.
 		EET_UPDATE///< Update data on the server or a client.
 	};
 
