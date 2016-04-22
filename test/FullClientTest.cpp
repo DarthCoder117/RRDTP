@@ -23,11 +23,11 @@ int main()
 	{
 		client.Poll();
 
-		/*int newVal = client.GetInt("test-val");
+		int newVal = client.GetInt("test-val");
 		if (newVal != oldVal)
 		{
-			std::cout << "Recieved " << newVal << "\n";
+			std::cout << "GetInt returned " << newVal << "\n";
 			oldVal = newVal;
-		}*/
+		}
 	}
 }

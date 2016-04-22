@@ -52,7 +52,19 @@ void Connection::dataRecieved(Socket* self, HostID sender, void* data, size_t da
 			Entry* entry = connection->m_localDataStore.Create(sender, identifier, (E_DATA_TYPE)dataType);
 			if (entry != NULL && /*entry->GetOwner() == sender &&*/ entry->GetType() == dataType)
 			{
-				entry->Set(value, dataSz);
+				//Update the value entry based on its type
+				if (dataType == EDT_INT)
+				{
+					entry->Set<int>(ntohl(*(int*)value));
+				}
+				else if (dataType == EDT_LONG)
+				{
+					entry->Set<long>(ntohl(*(long*)value));
+				}
+				else
+				{
+					entry->Set(value, dataSz);
+				}
 
 				if (connection->m_valueSetCallback)
 				{
@@ -184,7 +196,7 @@ int Connection::GetInt(const char* identifier, int defaultVal)
 		if (entry != NULL && entry->GetType() == EDT_INT)
 		{
 			//Return the value
-			return ntohl(entry->Get<int>());
+			return entry->Get<int>();
 		}
 	}
 
@@ -218,7 +230,7 @@ long Connection::GetLong(const char* identifier, long defaultVal)
 		if (entry != NULL && entry->GetType() == EDT_LONG)
 		{
 			//Return the value
-			return ntohl(entry->Get<long>());
+			return entry->Get<long>();
 		}
 	}
 
