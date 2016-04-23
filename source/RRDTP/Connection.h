@@ -9,8 +9,8 @@ namespace rrdtp
 	class Connection;
 	class Entry;
 
-	///@brief Callback for whenever a value is set.
-	typedef void(*ValueSetCallback)(Connection* connection, Entry* entry);
+	///@brief Callback for whenever a value is changed.
+	typedef void(*ValueChangedCallback)(Connection* connection, Entry* entry);
 
 	///@brief Manages an RRDTP connection.
 	class Connection
@@ -76,7 +76,7 @@ namespace rrdtp
 		void Poll();
 
 		///@brief Sets the callback that will be used when a value is changed.
-		void SetValueSetCallback(ValueSetCallback callback) { m_valueSetCallback = callback; }
+		void SetValueChangedCallback(ValueChangedCallback callback) { m_valueChangedCallback = callback; }
 
 	private:
 
@@ -85,17 +85,15 @@ namespace rrdtp
 		static void clientConnected(Socket* self, HostID client);
 
 		///@brief Sends a value update packet.
-		///@param type The data type of the value (packet will be ignored by the server if this is inconsistent).
 		///@param identifier The value identifier to update.
-		///@param data The data itself. This should be converted to network byte order already.
-		///@param dataSz The size of the data (in bytes)
-		void SendUpdatePacket(E_DATA_TYPE type, const char* identifier, const unsigned char* data, short dataSz);
+		///@param entry The entry to send the packet for.
+		void SendUpdatePacket(const char* identifier, Entry* entry);
 
 		Socket* m_socket;
 
 		LocalStore m_localDataStore;
 
-		ValueSetCallback m_valueSetCallback;
+		ValueChangedCallback m_valueChangedCallback;
 	};
 }
 

@@ -1,12 +1,13 @@
 #include <RRDTP.h>
+#include <RRDTP/Entry.h>
 #include <iostream>
 #include <cassert>
 
-void ValueSet(rrdtp::Connection* connection, rrdtp::Entry* entry)
+void ValueChanged(rrdtp::Connection* connection, rrdtp::Entry* entry)
 {
 	assert(strcmp(entry->GetName(), "test-val") == 0);
 
-	std::cout << "Recieved " << entry->Get<int>() << "\n";
+	std::cout << "Recieved " << ((rrdtp::IntEntry*)entry)->Get() << "\n";
 }
 
 int main()
@@ -16,7 +17,7 @@ int main()
 	rrdtp::Connection client;
 	client.StartClient("127.0.0.1");
 
-	client.SetValueSetCallback(&ValueSet);
+	client.SetValueChangedCallback(&ValueChanged);
 
 	int oldVal = 0;
 	while (true)

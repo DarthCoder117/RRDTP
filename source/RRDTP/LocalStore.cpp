@@ -1,57 +1,8 @@
 #include "RRDTP/LocalStore.h"
+#include "RRDTP/Entry.h"
 #include <cassert>
 
 using namespace rrdtp;
-
-Entry::Entry(HostID owner, const char* name, E_DATA_TYPE type)
-	:m_owner(owner),
-	m_name(name),
-	m_type(type),
-	m_size(0),
-	m_data(0)
-{}
-
-Entry::~Entry()
-{
-	if (m_size > sizeof(size_t) && m_data != 0)
-	{
-		delete[](unsigned char*)m_data;
-		m_data = 0;
-	}
-}
-
-void Entry::SetString(const char* str)
-{
-	assert(str);
-
-	size_t sz = strlen(str)*sizeof(char);
-	Reallocate(sz);
-
-	memcpy((void*)m_data, str, sz);
-	m_size = sz;
-}
-
-const char* Entry::GetString()
-{
-	const char* newStr = new char[m_size];
-	memcpy((void*)newStr, (void*)m_data, m_size);
-	return newStr;
-}
-
-void Entry::Reallocate(size_t sz)
-{
-	if (m_size < sz)
-	{
-		//Free memory if it has been allocated already
-		if (m_size != 0 && m_data != 0)
-		{
-			delete[](unsigned char*)m_data;
-			m_data = 0;
-		}
-
-		m_data = (size_t) new unsigned char[sz];
-	}
-}
 
 Category::~Category()
 {
@@ -107,7 +58,7 @@ Entry* Category::CreateEntry(HostID owner, const char* name, E_DATA_TYPE type)
 	//If it doesn't exist, then create it.
 	if (ret == NULL)
 	{
-		ret = new Entry(owner, name, type);
+		ret = Entry::Create(name, type);
 		m_entries.push_back(ret);
 	}
 

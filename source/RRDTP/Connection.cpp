@@ -1,6 +1,7 @@
 #include "RRDTP/Connection.h"
 #include "RRDTP/Platform.h"
 #include "RRDTP/DataBuffer.h"
+#include "RRDTP/Entry.h"
 #include <sstream>
 #include <cinttypes>
 #ifdef RRDTP_PLATFORM_WINDOWS
@@ -40,35 +41,16 @@ void Connection::dataRecieved(Socket* self, HostID sender, void* data, size_t da
 			char dataType = 0;
 			buffer.Read<char>(dataType);
 
-			//Size of data
-			short dataSz = 0;
-			buffer.Read<short>(dataSz);
-			dataSz = ntohs(dataSz);
-
-			//Actual data
-			unsigned char* value = ((unsigned char*)data)+buffer.GetPosition();
-
-			//Create/update the value
+			//Create/retrieve the entry and let it deserialize itself.
 			Entry* entry = connection->m_localDataStore.Create(sender, identifier, (E_DATA_TYPE)dataType);
-			if (entry != NULL && /*entry->GetOwner() == sender &&*/ entry->GetType() == dataType)
+			if (entry != NULL && entry->GetType() == dataType)
 			{
-				//Update the value entry based on its type
-				if (dataType == EDT_INT)
-				{
-					entry->Set<int>(ntohl(*(int*)value));
-				}
-				else if (dataType == EDT_LONG)
-				{
-					entry->Set<long>(ntohl(*(long*)value));
-				}
-				else
-				{
-					entry->Set(value, dataSz);
-				}
+				entry->Deserialize(buffer);
 
-				if (connection->m_valueSetCallback)
+				//Trigger value change callback
+				if (connection->m_valueChangedCallback)
 				{
-					connection->m_valueSetCallback(connection, entry);
+					connection->m_valueChangedCallback(connection, entry);
 				}
 			}
 		}	
@@ -93,7 +75,7 @@ void Connection::clientConnected(Socket* self, HostID client)
 
 Connection::Connection()
 	:m_socket(NULL),
-	m_valueSetCallback(NULL)
+	m_valueChangedCallback(NULL)
 {
 	m_socket = Socket::Create(&Connection::dataRecieved, this, &Connection::clientConnected);
 }
@@ -138,9 +120,9 @@ bool Connection::StartClient(const char* ip, unsigned int port)
 	return false;
 }
 
-void Connection::SendUpdatePacket(E_DATA_TYPE type, const char* identifier, const unsigned char* data, short dataSz)
+void Connection::SendUpdatePacket(const char* identifier, Entry* entry)
 {
-	if (m_socket != NULL && identifier != NULL && data != NULL && dataSz > 0)
+	if (m_socket != NULL && entry != NULL)
 	{	
 		int identifierLength = strlen(identifier);
 		if (identifierLength >= 255)
@@ -151,16 +133,19 @@ void Connection::SendUpdatePacket(E_DATA_TYPE type, const char* identifier, cons
 		unsigned char* packetData = new unsigned char[512];
 		DataBuffer buffer(packetData, 512);
 
+		//Write header for set packet
 		buffer.Write<char>(1);//Protocol version
 		buffer.Write<char>(EET_SET);//Event type
 
 		buffer.Write<char>((char)identifierLength);//Value identifier length
 		buffer.Write((const unsigned char*)identifier, identifierLength);//Value identifier
 
-		buffer.Write<char>((char)type);//Data type
-		buffer.Write<short>(htons(dataSz));//Size of data
+		//Data type
+		buffer.Write<char>((char)entry->GetType());
 
-		buffer.Write(data, dataSz);//Write the actual data. Conversion to network byte order should have been done already.
+		//Let the entry write its data. 
+		//The entry will handle endianness conversion and tracking of data size.
+		entry->Serialize(buffer);
 
 		//Send update packet to all connected clients.
 		m_socket->SendAll(packetData, buffer.GetPosition());
@@ -171,33 +156,25 @@ void Connection::SendUpdatePacket(E_DATA_TYPE type, const char* identifier, cons
 
 void Connection::SetInt(const char* identifier, int val)
 {
-	if (m_socket != NULL)
+	//Create/retrieve entry (id doesn't matter locally).
+	IntEntry* entry = (IntEntry*)m_localDataStore.Create(-1, identifier, EDT_INT);
+	if (entry != NULL)
 	{
-		//Create/retrieve entry (id doesn't matter locally).
-		Entry* entry = m_localDataStore.Create(-1, identifier, EDT_INT);
-		if (entry != NULL)
-		{
-			//Update the entry
-			entry->Set<int>(val);
+		//Update the entry
+		entry->Set(val);
 
-			//Send the update packet after converting to network byte order
-			int value = htonl(val);
-			SendUpdatePacket(EDT_INT, identifier, (const unsigned char*)&value, sizeof(int));
-		}
+		SendUpdatePacket(identifier, entry);//TODO: Track changed entries and only send those in Poll
 	}
 }
 
 int Connection::GetInt(const char* identifier, int defaultVal)
 {
-	if (m_socket != NULL)
+	//Retrieve entry
+	Entry* entry = m_localDataStore.Get(identifier);
+	if (entry != NULL && entry->GetType() == EDT_INT)
 	{
-		//Retrieve entry
-		Entry* entry = m_localDataStore.Get(identifier);
-		if (entry != NULL && entry->GetType() == EDT_INT)
-		{
-			//Return the value
-			return entry->Get<int>();
-		}
+		//Return the value
+		return ((IntEntry*)entry)->Get();
 	}
 
 	return defaultVal;
@@ -205,33 +182,25 @@ int Connection::GetInt(const char* identifier, int defaultVal)
 
 void Connection::SetLong(const char* identifier, long val)
 {
-	if (m_socket != NULL)
+	//Create/retrieve entry (id doesn't matter locally).
+	LongEntry* entry = (LongEntry*)m_localDataStore.Create(-1, identifier, EDT_LONG);
+	if (entry != NULL)
 	{
-		//Create/retrieve entry (id doesn't matter locally).
-		Entry* entry = m_localDataStore.Create(-1, identifier, EDT_LONG);
-		if (entry != NULL)
-		{
-			//Update the entry
-			entry->Set<long>(val);
+		//Update the entry
+		entry->Set(val);
 
-			//Send the update packet after converting to network byte order
-			long value = htonl(val);
-			SendUpdatePacket(EDT_LONG, identifier, (const unsigned char*)&value, sizeof(long));
-		}
+		SendUpdatePacket(identifier, entry);
 	}
 }
 
 long Connection::GetLong(const char* identifier, long defaultVal)
 {
-	if (m_socket != NULL)
+	//Retrieve entry
+	Entry* entry = m_localDataStore.Get(identifier);
+	if (entry != NULL && entry->GetType() == EDT_LONG)
 	{
-		//Retrieve entry
-		Entry* entry = m_localDataStore.Get(identifier);
-		if (entry != NULL && entry->GetType() == EDT_LONG)
-		{
-			//Return the value
-			return entry->Get<long>();
-		}
+		//Return the value
+		return ((LongEntry*)entry)->Get();
 	}
 
 	return defaultVal;
@@ -239,33 +208,25 @@ long Connection::GetLong(const char* identifier, long defaultVal)
 
 void Connection::SetBool(const char* identifier, bool val)
 {
-	if (m_socket != NULL)
+	//Create/retrieve entry (id doesn't matter locally).
+	BooleanEntry* entry = (BooleanEntry*)m_localDataStore.Create(-1, identifier, EDT_BOOLEAN);
+	if (entry != NULL)
 	{
-		//Create/retrieve entry (id doesn't matter locally).
-		Entry* entry = m_localDataStore.Create(-1, identifier, EDT_BOOLEAN);
-		if (entry != NULL)
-		{
-			//Update the entry
-			entry->Set<bool>(val);
+		//Update the entry
+		entry->Set(val);
 
-			//Send as char to avoid having to deal with byte-ordering
-			char value = (char)val;
-			SendUpdatePacket(EDT_BOOLEAN, identifier, (const unsigned char*)&value, sizeof(char));
-		}
+		SendUpdatePacket(identifier, entry);
 	}
 }
 
 bool Connection::GetBool(const char* identifier, bool defaultVal)
 {
-	if (m_socket != NULL)
+	//Retrieve entry
+	Entry* entry = m_localDataStore.Get(identifier);
+	if (entry != NULL && entry->GetType() == EDT_BOOLEAN)
 	{
-		//Retrieve entry
-		Entry* entry = m_localDataStore.Get(identifier);
-		if (entry != NULL && entry->GetType() == EDT_BOOLEAN)
-		{
-			//Return the value
-			return entry->Get<bool>();
-		}
+		//Return the value
+		return ((BooleanEntry*)entry)->Get();
 	}
 
 	return defaultVal;
@@ -273,33 +234,27 @@ bool Connection::GetBool(const char* identifier, bool defaultVal)
 
 void Connection::SetString(const char* identifier, const char* str)
 {
-	if (m_socket != NULL && str != NULL)
+	int stringLength = strlen(str);
+
+	//Create/retrieve entry (id doesn't matter locally).
+	StringEntry* entry = (StringEntry*)m_localDataStore.Create(-1, identifier, EDT_STRING);
+	if (entry != NULL)
 	{
-		int stringLength = strlen(str);
+		//Update the entry
+		entry->Set(str);
 
-		//Create/retrieve entry (id doesn't matter locally).
-		Entry* entry = m_localDataStore.Create(-1, identifier, EDT_STRING);
-		if (entry != NULL)
-		{
-			//Update the entry
-			entry->SetString(str);
-
-			SendUpdatePacket(EDT_STRING, identifier, (const unsigned char*)str, sizeof(char)*stringLength);
-		}
+		SendUpdatePacket(identifier, entry);
 	}
 }
 
 const char* Connection::GetString(const char* identifier, const char* defaultVal)
 {
-	if (m_socket != NULL)
+	//Retrieve entry
+	Entry* entry = m_localDataStore.Get(identifier);
+	if (entry != NULL && entry->GetType() == EDT_STRING)
 	{
-		//Retrieve entry
-		Entry* entry = m_localDataStore.Get(identifier);
-		if (entry != NULL && entry->GetType() == EDT_STRING)
-		{
-			//Return the value
-			return entry->GetString();
-		}
+		//Return the value
+		return ((StringEntry*)entry)->Get();
 	}
 
 	return defaultVal;

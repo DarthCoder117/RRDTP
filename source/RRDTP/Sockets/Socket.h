@@ -7,6 +7,9 @@ namespace rrdtp
 	///@brief Type for identifying a unique remote host.
 	typedef size_t HostID;
 
+	///@brief The host ID for the local system.
+	const HostID LOCAL_HOST_ID = -1;
+
 	///@brief Socket error code enum.
 	enum E_SOCKET_ERROR
 	{
