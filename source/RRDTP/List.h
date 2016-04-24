@@ -1,6 +1,7 @@
 #ifndef List_H
 #define List_H
 #include <string>
+#include <cassert>
 
 namespace rrdtp
 {
@@ -15,8 +16,14 @@ namespace rrdtp
 		{
 		public:
 
+			Node()
+				:m_value(0),
+				m_next(NULL)
+			{}
+
 			Node(const T& val)
-				:m_value(val)
+				:m_value(val),
+				m_next(NULL)
 			{}
 
 			void SetValue(const T& val)
@@ -36,12 +43,15 @@ namespace rrdtp
 
 		private:
 
+			friend class List;
+
 			T m_value;
 
 			Node* m_next;
 		};
 
 		List()
+			:m_size(0)
 		{}
 
 		~List()
@@ -70,6 +80,8 @@ namespace rrdtp
 			location->m_next = node;
 			node->m_next = next;
 
+			m_size++;
+
 			return node;
 		}
 
@@ -77,17 +89,28 @@ namespace rrdtp
 		///@return The node that took the place of the last one (for erasing while iterating).
 		Node* Erase(Node* node)
 		{
+			assert(node != NULL);
+
 			Node* next = node->GetNext();
 			if (next != NULL)
 			{
-				node->m_data = next->m_data;
+				node->m_value = next->m_value;
 				delete next;
 			}
 
+			m_size--;
 			return node;
 		}
 
+		///@return The number of elements in the list.
+		unsigned int Size()
+		{
+			return m_size;
+		}
+
 	private:
+
+		unsigned int m_size;
 
 		Node m_root;
 	};
