@@ -2,6 +2,7 @@
 #define LocalStore_H
 #include "RRDTP/Types.h"
 #include "RRDTP/Sockets/Socket.h"
+#include "RRDTP/List.h"
 #include <list>
 #include <cassert>
 
@@ -55,8 +56,8 @@ namespace rrdtp
 		Category(const Category& oth)
 		{}
 
-		std::list<Category*> m_subcategories;
-		std::list<Entry*> m_entries;
+		List<Category*> m_subcategories;
+		List<Entry*> m_entries;
 
 		const char* m_name;
 	};

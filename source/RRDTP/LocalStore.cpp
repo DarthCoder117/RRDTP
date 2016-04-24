@@ -6,19 +6,25 @@ using namespace rrdtp;
 
 Category::~Category()
 {
-	for (std::list<Category*>::iterator iter = m_subcategories.begin(); iter != m_subcategories.end(); ++iter)
+	List<Category*>::Node* c = m_subcategories.Begin();
+	while (c != NULL)
 	{
-		delete *iter;
+		delete c->GetValue();
+
+		c = c->GetNext();
 	}
 
-	m_subcategories.clear();
+	m_subcategories.Clear();
 
-	for (std::list<Entry*>::iterator iter = m_entries.begin(); iter != m_entries.end(); ++iter)
+	List<Entry*>::Node* e = m_entries.Begin();
+	while (e != NULL)
 	{
-		delete *iter;
+		delete e->GetValue();
+
+		e = e->GetNext();
 	}
 
-	m_subcategories.clear();
+	m_entries.Clear();
 }
 
 Category* Category::CreateSubcategory(const char* name)
@@ -30,7 +36,7 @@ Category* Category::CreateSubcategory(const char* name)
 	if (ret == NULL)
 	{
 		ret = new Category(name);
-		m_subcategories.push_back(ret);
+		m_subcategories.Insert(ret);
 	}
 
 	return ret;
@@ -38,13 +44,15 @@ Category* Category::CreateSubcategory(const char* name)
 
 Category* Category::GetSubcategory(const char* name)
 {
-	std::list<Category*>::iterator iter;
-	for (iter = m_subcategories.begin(); iter != m_subcategories.end(); ++iter)
+	List<Category*>::Node* n = m_subcategories.Begin();
+	while (n != NULL)
 	{
-		if (strcmp((*iter)->m_name, name) == 0)
+		if (strcmp(n->GetValue()->GetName(), name) == 0)
 		{
-			return *iter;
+			return n->GetValue();
 		}
+
+		n = n->GetNext();
 	}
 
 	return NULL;
@@ -59,7 +67,7 @@ Entry* Category::CreateEntry(HostID owner, const char* name, E_DATA_TYPE type)
 	if (ret == NULL)
 	{
 		ret = Entry::Create(name, type);
-		m_entries.push_back(ret);
+		m_entries.Insert(ret);
 	}
 
 	return ret;
@@ -67,13 +75,15 @@ Entry* Category::CreateEntry(HostID owner, const char* name, E_DATA_TYPE type)
 
 Entry* Category::GetEntry(const char* name)
 {
-	std::list<Entry*>::iterator iter;
-	for (iter = m_entries.begin(); iter != m_entries.end(); ++iter)
+	List<Entry*>::Node* n = m_entries.Begin();
+	while (n != NULL)
 	{
-		if (strcmp((*iter)->GetName(), name) == 0)
+		if (strcmp(n->GetValue()->GetName(), name) == 0)
 		{
-			return *iter;
+			return n->GetValue();
 		}
+
+		n = n->GetNext();
 	}
 
 	return NULL;
@@ -81,13 +91,15 @@ Entry* Category::GetEntry(const char* name)
 
 Entry* Category::GetEntry(const char* name, E_DATA_TYPE type)
 {
-	std::list<Entry*>::iterator iter;
-	for (iter = m_entries.begin(); iter != m_entries.end(); ++iter)
+	List<Entry*>::Node* n = m_entries.Begin();
+	while (n != NULL)
 	{
-		if (strcmp((*iter)->GetName(), name) == 0 && (*iter)->GetType() == type)
+		if (strcmp(n->GetValue()->GetName(), name) == 0 && n->GetValue()->GetType() == type)
 		{
-			return *iter;
+			return n->GetValue();
 		}
+
+		n = n->GetNext();
 	}
 
 	return NULL;

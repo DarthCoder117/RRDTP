@@ -102,6 +102,15 @@ namespace rrdtp
 			return node;
 		}
 
+		///@brief Removes all nodes in the list.
+		void Clear()
+		{
+			while (Size() > 0)
+			{
+				Erase(Begin());
+			}
+		}
+
 		///@return The number of elements in the list.
 		unsigned int Size()
 		{
