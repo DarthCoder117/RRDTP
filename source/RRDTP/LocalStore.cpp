@@ -8,7 +8,7 @@ DataEntry* LocalStore::FindOrCreate(const char* identifier, E_DATA_TYPE type)
 	DataEntry* result = NULL;
 
 	//Tokenize string and search through the tree until the identifier is found.
-	char* identifierCpy = _strdup(identifier);
+	char* identifierCpy = strdup(identifier);
 	char* pch = strtok(identifierCpy, ".");
 	while (pch != NULL)//For each token
 	{

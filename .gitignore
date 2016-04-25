@@ -31,3 +31,4 @@
 projects/*
 bin/*
 lib/*
+.idea/*

@@ -107,7 +107,7 @@ namespace rrdtp
 				if (m_data == 0)//No memory has been allocated yet if m_data == 0.
 				{
 					m_dataSz = sizeof(T);
-					m_data = new char[sizeof(T)];
+					m_data = (size_t) new char[sizeof(T)];
 				}
 
 				//Check that sizes match and then copy.
