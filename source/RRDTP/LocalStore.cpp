@@ -116,7 +116,7 @@ Entry* LocalStore::Create(HostID owner, const char* identifier, E_DATA_TYPE type
 	Entry* entry = NULL;
 
 	//Create copy of string to tokenize.
-	char* identifierCopy = _strdup(identifier);
+	char* identifierCopy = strdup(identifier);
 
 	//Loop over tokens
 	char* nextToken = NULL;
@@ -154,7 +154,7 @@ Entry* LocalStore::Get(const char* identifier)
 	Category* category = &m_rootCategory;
 	Entry* entry = NULL;
 
-	char* identifierCopy = _strdup(identifier);
+	char* identifierCopy = strdup(identifier);
 
 	//Loop over tokens
 	char* nextToken = NULL;
