@@ -164,7 +164,7 @@ void Connection::SynchronizeAllEntriesImplementation(Category* start)
 {
 	//Send packet for each entry
 	List<Entry*>::Node* n = start->GetEntries().Begin();
-	while (n->HasNext())
+	while (n != NULL)
 	{
 		SendUpdatePacket(n->GetValue()->GetIdentifier(), n->GetValue());
 
