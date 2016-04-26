@@ -70,7 +70,8 @@ void Connection::clientConnected(Socket* self, HostID client)
 
 	self->Send(packetData, 2);
 
-	//TODO: Iterate through all values in local store and create them on the newly connected client.
+	//Send out update packet for all currently existing values.
+	connection->SynchronizeAllEntries();
 }
 
 Connection::Connection()
@@ -151,6 +152,23 @@ void Connection::SendUpdatePacket(const char* identifier, Entry* entry)
 		m_socket->SendAll(packetData, buffer.GetPosition());
 
 		delete[] packetData;
+	}
+}
+
+void Connection::SynchronizeAllEntries()
+{
+	SynchronizeAllEntriesImplementation(m_localDataStore.GetRootCategory());
+}
+
+void Connection::SynchronizeAllEntriesImplementation(Category* start)
+{
+	//Send packet for each entry
+	List<Entry*>::Node* n = start->GetEntries().Begin();
+	while (n->HasNext())
+	{
+		SendUpdatePacket(n->GetValue()->GetIdentifier(), n->GetValue());
+
+		n = n->GetNext();
 	}
 }
 

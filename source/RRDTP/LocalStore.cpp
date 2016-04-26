@@ -58,22 +58,26 @@ Category* Category::GetSubcategory(const char* name)
 	return NULL;
 }
 
-Entry* Category::CreateEntry(HostID owner, const char* name, E_DATA_TYPE type)
+Entry* Category::CreateEntry(HostID owner, const char* identifier, E_DATA_TYPE type)
 {
 	//Check for existing entry first.
-	Entry* ret = GetEntry(name, type);
+	Entry* ret = GetEntryByIdentifier(identifier);
+	if (ret != NULL && ret->GetType() != type)
+	{
+		return NULL;
+	}
 
 	//If it doesn't exist, then create it.
 	if (ret == NULL)
 	{
-		ret = Entry::Create(name, type);
+		ret = Entry::Create(identifier, type);
 		m_entries.Insert(ret);
 	}
 
 	return ret;
 }
 
-Entry* Category::GetEntry(const char* name)
+Entry* Category::GetEntryByName(const char* name)
 {
 	List<Entry*>::Node* n = m_entries.Begin();
 	while (n != NULL)
@@ -89,12 +93,12 @@ Entry* Category::GetEntry(const char* name)
 	return NULL;
 }
 
-Entry* Category::GetEntry(const char* name, E_DATA_TYPE type)
+Entry* Category::GetEntryByIdentifier(const char* identifier)
 {
 	List<Entry*>::Node* n = m_entries.Begin();
 	while (n != NULL)
 	{
-		if (strcmp(n->GetValue()->GetName(), name) == 0 && n->GetValue()->GetType() == type)
+		if (strcmp(n->GetValue()->GetIdentifier(), identifier) == 0)
 		{
 			return n->GetValue();
 		}
@@ -134,7 +138,7 @@ Entry* LocalStore::Create(HostID owner, const char* identifier, E_DATA_TYPE type
 		//Otherwise we've reached the value and can create it.
 		else
 		{
-			entry = category->CreateEntry(owner, token, type);
+			entry = category->CreateEntry(owner, identifier, type);
 		}
 
 		//Next token becomes current token for next loop iteration.
@@ -172,7 +176,7 @@ Entry* LocalStore::Get(const char* identifier)
 		//Otherwise we've reached the value.
 		else
 		{
-			entry = category->GetEntry(token);
+			entry = category->GetEntryByName(token);
 		}
 
 		//Next token becomes current token for next loop iteration.

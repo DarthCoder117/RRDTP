@@ -13,15 +13,17 @@ namespace rrdtp
 	public:
 
 		///@brief Create an Entry of the specified type.
-		static Entry* Create(const char* name, E_DATA_TYPE type);
+		static Entry* Create(const char* identifier, E_DATA_TYPE type);
 
-		Entry(HostID owner, const char* name);
+		Entry(HostID owner, const char* identifier);
 
 		virtual ~Entry() {}
 
 		HostID GetOwner();
 
 		const char* GetName();
+
+		const char* GetIdentifier();
 
 		virtual E_DATA_TYPE GetType() = 0;
 
@@ -39,7 +41,9 @@ namespace rrdtp
 
 		HostID m_owner;
 
-		const char* m_name;
+		const char* m_identifier;
+
+		const char* m_name;///< Pointer to the section of the identifier string where the name starts.
 	};
 
 	///@brief Entry used for holding 32-bit integer data.
@@ -47,7 +51,7 @@ namespace rrdtp
 	{
 	public:
 
-		IntEntry(HostID owner, const char* name);
+		IntEntry(HostID owner, const char* identifier);
 
 		E_DATA_TYPE GetType() { return EDT_INT; }
 
@@ -69,7 +73,7 @@ namespace rrdtp
 	{
 	public:
 
-		LongEntry(HostID owner, const char* name);
+		LongEntry(HostID owner, const char* identifier);
 
 		E_DATA_TYPE GetType() { return EDT_LONG; }
 
@@ -91,7 +95,7 @@ namespace rrdtp
 	{
 	public:
 
-		BooleanEntry(HostID owner, const char* name);
+		BooleanEntry(HostID owner, const char* identifier);
 
 		E_DATA_TYPE GetType() { return EDT_BOOLEAN; }
 
@@ -113,7 +117,7 @@ namespace rrdtp
 	{
 	public:
 
-		StringEntry(HostID owner, const char* name);
+		StringEntry(HostID owner, const char* identifier);
 
 		~StringEntry();
 

@@ -23,6 +23,18 @@ namespace rrdtp
 		///@brief Gets a subcategory by name.
 		Category* GetSubcategory(const char* name);
 
+		///@return A reference to the list of subcategories.
+		List<Category*>& GetSubcategories()
+		{
+			return m_subcategories;
+		}
+
+		///@return A reference to the list of entries.
+		List<Entry*>& GetEntries()
+		{
+			return m_entries;
+		}
+
 		///@brief Creates a new entry if one doesn't already exist.
 		///@param owner When creating an entry, the host ID of the creator needs to be specified so that the server can track who owns what entry.
 		///@param name The name of the entry.
@@ -34,11 +46,10 @@ namespace rrdtp
 
 		///@brief Finds an entry inside this category by name regardless of type.
 		///@return The entry if it was found. NULL otherwise.
-		Entry* GetEntry(const char* name);
-		///@brief Finds an entry inside this category with a matching type.
-		///@return If an entry is found and the data types match, then this will return the entry. 
-		///Otherwise, if the data types don't match or no entry exists, then this will return NULL.
-		Entry* GetEntry(const char* name, E_DATA_TYPE type);
+		Entry* GetEntryByName(const char* name);
+		///@brief Finds an entry inside this category by identifier regardless of type.
+		///@return The entry if it was found. NULL otherwise.
+		Entry* GetEntryByIdentifier(const char* identifier);
 
 		const char* GetName()
 		{

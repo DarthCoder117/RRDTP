@@ -89,6 +89,10 @@ namespace rrdtp
 		///@param entry The entry to send the packet for.
 		void SendUpdatePacket(const char* identifier, Entry* entry);
 
+		///@brief Sends out an update packet for all existing entries.
+		void SynchronizeAllEntries();
+		void SynchronizeAllEntriesImplementation(Category* start);
+
 		Socket* m_socket;
 
 		LocalStore m_localDataStore;

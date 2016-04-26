@@ -36,6 +36,11 @@ namespace rrdtp
 				return m_value;
 			}
 
+			bool HasNext()
+			{
+				return m_next != NULL;
+			}
+
 			Node* GetNext()
 			{
 				return m_next;

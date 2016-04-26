@@ -11,10 +11,21 @@
 
 using namespace rrdtp;
 
-Entry::Entry(HostID owner, const char* name)
+Entry::Entry(HostID owner, const char* identifier)
 	:m_owner(owner),
-	m_name(name)
-{}
+	m_identifier(identifier),
+	m_name(NULL)
+{
+	assert(identifier != NULL);
+
+	//Set name pointer based on last index of '.'
+	m_name = strrchr(identifier, '.');
+	//If there was no '.' then it's a top level identifier, and so the name is the same as the identifier.
+	if (m_name == NULL)
+	{
+		m_name = m_identifier;
+	}
+}
 
 HostID Entry::GetOwner()
 { 
@@ -26,23 +37,28 @@ const char* Entry::GetName()
 	return m_name; 
 }
 
-Entry* Entry::Create(const char* name, E_DATA_TYPE type)
+const char* Entry::GetIdentifier()
+{
+	return m_identifier;
+}
+
+Entry* Entry::Create(const char* identifier, E_DATA_TYPE type)
 {
 	if (type == EDT_INT)
 	{
-		return new IntEntry(0, name);
+		return new IntEntry(0, identifier);
 	}
 	else if (type == EDT_LONG)
 	{
-		return new LongEntry(0, name);
+		return new LongEntry(0, identifier);
 	}
 	else if (type == EDT_BOOLEAN)
 	{
-		return new BooleanEntry(0, name);
+		return new BooleanEntry(0, identifier);
 	}
 	else if (type == EDT_STRING)
 	{
-		return new StringEntry(0, name);
+		return new StringEntry(0, identifier);
 	}
 
 	return NULL;
@@ -52,8 +68,8 @@ Entry* Entry::Create(const char* name, E_DATA_TYPE type)
 //Int
 //===============================================================================================
 
-IntEntry::IntEntry(HostID owner, const char* name)
-	:Entry(owner, name),
+IntEntry::IntEntry(HostID owner, const char* identifier)
+	:Entry(owner, identifier),
 	m_integer(0)
 {}
 
@@ -85,8 +101,8 @@ void IntEntry::Deserialize(DataBuffer& in)
 //Long
 //===============================================================================================
 
-LongEntry::LongEntry(HostID owner, const char* name)
-	:Entry(owner, name),
+LongEntry::LongEntry(HostID owner, const char* identifier)
+	:Entry(owner, identifier),
 	m_integer(0)
 {}
 
@@ -118,8 +134,8 @@ void LongEntry::Deserialize(DataBuffer& in)
 //Boolean
 //===============================================================================================
 
-BooleanEntry::BooleanEntry(HostID owner, const char* name)
-	:Entry(owner, name),
+BooleanEntry::BooleanEntry(HostID owner, const char* identifier)
+	:Entry(owner, identifier),
 	m_boolean(false)
 {}
 
@@ -151,8 +167,8 @@ void BooleanEntry::Deserialize(DataBuffer& in)
 //String
 //===============================================================================================
 
-StringEntry::StringEntry(HostID owner, const char* name)
-	:Entry(owner, name),
+StringEntry::StringEntry(HostID owner, const char* identifier)
+	:Entry(owner, identifier),
 	m_capacity(0),
 	m_string(NULL)
 {}
