@@ -72,6 +72,10 @@ namespace rrdtp
 		///@return A pointer to a copy of the retrieved value. The caller is responsible for ensuring that delete[] is called when finished with the value.
 		const char* GetString(const char* identifier, const char* defaultVal = "");
 
+		///@brief Deletes an entry.
+		///@param identifier A valid value identifier.
+		void Delete(const char* identifier);
+
 		///@brief Called periodically to check for new values and update the local data store with new ones.
 		void Poll();
 
@@ -88,6 +92,9 @@ namespace rrdtp
 		///@param entry The entry to send the packet for.
 		///@param target The target host to send the update packet to. Setting this to -1 (the default) will send packets to all connected clients.
 		void SendUpdatePacket(Entry* entry, HostID target=-1);
+
+		///@brief Sends a value deletion packet.
+		void SendDeletionPacket(const char* identifier);
 
 		///@brief Sends out an update packet for all existing entries.
 		void SynchronizeAllEntries(HostID client);

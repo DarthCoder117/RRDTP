@@ -96,7 +96,8 @@ namespace rrdtp
 
 		///@brief Gets an entry.
 		///@param identifier The full value identifier of the entry to search for.
-		void Delete(const char* identifier);
+		///@return True if the value entry was deleted, false if it didn't exist.
+		bool Delete(const char* identifier);
 
 		///@return The root category that all the other categories are stored in.
 		Category* GetRootCategory()

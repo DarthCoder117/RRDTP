@@ -148,11 +148,11 @@ Entry* LocalStore::Create(HostID owner, const char* identifier, E_DATA_TYPE type
 	return entry;
 }
 
-void LocalStore::Delete(const char* identifier)
+bool LocalStore::Delete(const char* identifier)
 {
 	if (identifier == NULL)
 	{
-		return;
+		return false;
 	}
 
 	Category* category = &m_rootCategory;
@@ -185,7 +185,7 @@ void LocalStore::Delete(const char* identifier)
 				{
 					delete n->GetValue();
 					entries.Erase(n);
-					return;
+					return true;
 				}
 
 				n = n->GetNext();
@@ -195,6 +195,8 @@ void LocalStore::Delete(const char* identifier)
 		//Next token becomes current token for next loop iteration.
 		token = nextToken;
 	}
+
+	return false;
 }
 
 Entry* LocalStore::Get(const char* identifier)

@@ -153,6 +153,29 @@ void Connection::SendUpdatePacket(Entry* entry, HostID target)
 	}
 }
 
+void Connection::SendDeletionPacket(const char* identifier)
+{
+	int identifierLength = strlen(identifier);
+	if (identifierLength >= 255)
+	{
+		return;
+	}
+
+	unsigned char* packetData = new unsigned char[512];
+	DataBuffer buffer(packetData, 512);
+
+	//Write header for set packet
+	buffer.Write<char>(1);//Protocol version
+	buffer.Write<char>(EET_DELETE);//Event type
+
+	buffer.Write<char>((char)identifierLength);//Value identifier length
+	buffer.Write((const unsigned char*)identifier, identifierLength);//Value identifier
+
+	m_socket->SendAll(packetData, buffer.GetPosition());
+
+	delete[] packetData;
+}
+
 void Connection::SynchronizeAllEntries(HostID client)
 {
 	SynchronizeAllEntriesImplementation(m_localDataStore.GetRootCategory(), client);
@@ -274,6 +297,14 @@ const char* Connection::GetString(const char* identifier, const char* defaultVal
 	}
 
 	return defaultVal;
+}
+
+void Connection::Delete(const char* identifier)
+{
+	if (m_localDataStore.Delete(identifier))
+	{
+		SendDeletionPacket(identifier);
+	}
 }
 
 void Connection::Poll()
