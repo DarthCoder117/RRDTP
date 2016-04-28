@@ -33,3 +33,11 @@ cpp/bin/*
 cpp/lib/*
 cpp/docs/*
 cpp/.idea/*
+
+java/nbproject/private/*
+java/build/*
+java/nbbuild/*
+java/dist/*
+java/nbdist/*
+java/nbactions.xml
+java/.nb-gradle/*
