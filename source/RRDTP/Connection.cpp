@@ -71,7 +71,7 @@ void Connection::clientConnected(Socket* self, HostID client)
 	self->Send(packetData, 2);
 
 	//Send out update packet for all currently existing values.
-	connection->SynchronizeAllEntries();
+	connection->SynchronizeAllEntries(client);
 }
 
 Connection::Connection()
@@ -121,11 +121,11 @@ bool Connection::StartClient(const char* ip, unsigned int port)
 	return false;
 }
 
-void Connection::SendUpdatePacket(const char* identifier, Entry* entry)
+void Connection::SendUpdatePacket(Entry* entry, HostID target)
 {
 	if (m_socket != NULL && entry != NULL)
 	{	
-		int identifierLength = strlen(identifier);
+		int identifierLength = strlen(entry->GetIdentifier());
 		if (identifierLength >= 255)
 		{
 			return;
@@ -139,7 +139,7 @@ void Connection::SendUpdatePacket(const char* identifier, Entry* entry)
 		buffer.Write<char>(EET_SET);//Event type
 
 		buffer.Write<char>((char)identifierLength);//Value identifier length
-		buffer.Write((const unsigned char*)identifier, identifierLength);//Value identifier
+		buffer.Write((const unsigned char*)entry->GetIdentifier(), identifierLength);//Value identifier
 
 		//Data type
 		buffer.Write<char>((char)entry->GetType());
@@ -148,25 +148,32 @@ void Connection::SendUpdatePacket(const char* identifier, Entry* entry)
 		//The entry will handle endianness conversion and tracking of data size.
 		entry->Serialize(buffer);
 
-		//Send update packet to all connected clients.
-		m_socket->SendAll(packetData, buffer.GetPosition());
+		//Send update packet to newly connected clients.
+		if (target == -1)
+		{
+			m_socket->SendAll(packetData, buffer.GetPosition());
+		}
+		else
+		{
+			m_socket->Send(packetData, buffer.GetPosition(), target);
+		}
 
 		delete[] packetData;
 	}
 }
 
-void Connection::SynchronizeAllEntries()
+void Connection::SynchronizeAllEntries(HostID client)
 {
-	SynchronizeAllEntriesImplementation(m_localDataStore.GetRootCategory());
+	SynchronizeAllEntriesImplementation(m_localDataStore.GetRootCategory(), client);
 }
 
-void Connection::SynchronizeAllEntriesImplementation(Category* start)
+void Connection::SynchronizeAllEntriesImplementation(Category* start, HostID client)
 {
 	//Send packet for each entry
 	List<Entry*>::Node* n = start->GetEntries().Begin();
 	while (n != NULL)
 	{
-		SendUpdatePacket(n->GetValue()->GetIdentifier(), n->GetValue());
+		SendUpdatePacket(n->GetValue(), client);
 
 		n = n->GetNext();
 	}
@@ -181,7 +188,7 @@ void Connection::SetInt(const char* identifier, int val)
 		//Update the entry
 		entry->Set(val);
 
-		SendUpdatePacket(identifier, entry);//TODO: Track changed entries and only send those in Poll
+		SendUpdatePacket(entry);//TODO: Track changed entries and only send those in Poll
 	}
 }
 
@@ -207,7 +214,7 @@ void Connection::SetLong(const char* identifier, long val)
 		//Update the entry
 		entry->Set(val);
 
-		SendUpdatePacket(identifier, entry);
+		SendUpdatePacket(entry);
 	}
 }
 
@@ -233,7 +240,7 @@ void Connection::SetBool(const char* identifier, bool val)
 		//Update the entry
 		entry->Set(val);
 
-		SendUpdatePacket(identifier, entry);
+		SendUpdatePacket(entry);
 	}
 }
 
@@ -261,7 +268,7 @@ void Connection::SetString(const char* identifier, const char* str)
 		//Update the entry
 		entry->Set(str);
 
-		SendUpdatePacket(identifier, entry);
+		SendUpdatePacket(entry);
 	}
 }
 

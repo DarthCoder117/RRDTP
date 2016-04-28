@@ -85,13 +85,13 @@ namespace rrdtp
 		static void clientConnected(Socket* self, HostID client);
 
 		///@brief Sends a value update packet.
-		///@param identifier The value identifier to update.
 		///@param entry The entry to send the packet for.
-		void SendUpdatePacket(const char* identifier, Entry* entry);
+		///@param target The target host to send the update packet to. Setting this to -1 (the default) will send packets to all connected clients.
+		void SendUpdatePacket(Entry* entry, HostID target=-1);
 
 		///@brief Sends out an update packet for all existing entries.
-		void SynchronizeAllEntries();
-		void SynchronizeAllEntriesImplementation(Category* start);
+		void SynchronizeAllEntries(HostID client);
+		void SynchronizeAllEntriesImplementation(Category* start, HostID client);
 
 		Socket* m_socket;
 
