@@ -159,7 +159,7 @@ void BooleanEntry::Deserialize(DataBuffer& in)
 	char val = 0;
 	if (in.Read<char>(val))
 	{
-		m_boolean = (bool)val;
+		m_boolean = (val != 0);
 	}
 }
 
