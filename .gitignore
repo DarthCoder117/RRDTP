@@ -28,8 +28,8 @@
 *.app
 
 # Custom folders
-projects/*
-bin/*
-lib/*
-docs/*
-.idea/*
+cpp/projects/*
+cpp/bin/*
+cpp/lib/*
+cpp/docs/*
+cpp/.idea/*
