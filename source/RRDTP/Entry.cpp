@@ -204,16 +204,16 @@ const char* StringEntry::Get()
 
 void StringEntry::Serialize(DataBuffer& out)
 {
-	short len = (short)strlen(m_string);
-	out.Write<short>(len);
+	short len = (unsigned short)strlen(m_string);
+	out.Write<unsigned short>(len);
 
 	out.Write((const unsigned char*)m_string, len);
 }
 
 void StringEntry::Deserialize(DataBuffer& in)
 {
-	short len = 0;
-	in.Read<short>(len);
+	unsigned short len = 0;
+	in.Read<unsigned short>(len);
 
 	EnsureCapacity(len);
 	in.Read((const unsigned char*)m_string, len);
