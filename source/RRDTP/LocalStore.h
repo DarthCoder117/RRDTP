@@ -94,6 +94,10 @@ namespace rrdtp
 		///@param identifier The full value identifier of the entry to search for.
 		Entry* Get(const char* identifier);
 
+		///@brief Gets an entry.
+		///@param identifier The full value identifier of the entry to search for.
+		void Delete(const char* identifier);
+
 		///@return The root category that all the other categories are stored in.
 		Category* GetRootCategory()
 		{

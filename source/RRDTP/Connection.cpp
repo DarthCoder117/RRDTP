@@ -26,8 +26,10 @@ void Connection::dataRecieved(Socket* self, HostID sender, void* data, size_t da
 		buffer.Read<char>(eventType);
 
 		//Depending on the event type, different packets may have different contents.
-		if (eventType == EET_SET)
+		if (eventType == EET_SET || eventType == EET_DELETE)
 		{
+			//SET and DELETE both start with the value identifier, so we read that here.
+
 			//Length of value identifier
 			char identifierLength = 0;
 			buffer.Read<char>(identifierLength);
@@ -37,38 +39,36 @@ void Connection::dataRecieved(Socket* self, HostID sender, void* data, size_t da
 			buffer.Read((unsigned char*)identifier, identifierLength);
 			identifier[identifierLength] = '\0';
 
-			//Data type
-			char dataType = 0;
-			buffer.Read<char>(dataType);
-
-			//Create/retrieve the entry and let it deserialize itself.
-			Entry* entry = connection->m_localDataStore.Create(sender, identifier, (E_DATA_TYPE)dataType);
-			if (entry != NULL && entry->GetType() == dataType)
+			if (eventType == EET_SET)
 			{
-				entry->Deserialize(buffer);
+				//Data type
+				char dataType = 0;
+				buffer.Read<char>(dataType);
 
-				//Trigger value change callback
-				if (connection->m_valueChangedCallback)
+				//Create/retrieve the entry and let it deserialize itself.
+				Entry* entry = connection->m_localDataStore.Create(sender, identifier, (E_DATA_TYPE)dataType);
+				if (entry != NULL && entry->GetType() == dataType)
 				{
-					connection->m_valueChangedCallback(connection, entry);
+					entry->Deserialize(buffer);
+
+					//Trigger value change callback
+					if (connection->m_valueChangedCallback)
+					{
+						connection->m_valueChangedCallback(connection, entry);
+					}
 				}
 			}
-		}	
+			else if(eventType == EET_DELETE)
+			{
+				connection->m_localDataStore.Delete(identifier);
+			}
+		}
 	}
 }
 
 void Connection::clientConnected(Socket* self, HostID client)
 {
 	Connection* connection = (Connection*)self->GetUserData();
-
-	//Once connected to the server, send it the client handshake packet.
-	unsigned char packetData[2];
-	DataBuffer buffer(packetData, 2);
-
-	buffer.Write<char>(1);//Protocol version
-	buffer.Write<char>(EET_SERVER_HANDSHAKE);//Event type
-
-	self->Send(packetData, 2);
 
 	//Send out update packet for all currently existing values.
 	connection->SynchronizeAllEntries(client);
@@ -104,15 +104,6 @@ bool Connection::StartClient(const char* ip, unsigned int port)
 		if (m_socket->Connect(ip, port, ESP_TCP) == ESE_SUCCESS)
 		{
 			printf("Connected to server.\n");
-
-			//Once connected to the server, send it the client handshake packet.
-			unsigned char packetData[2];
-			DataBuffer buffer(packetData, 2);
-
-			buffer.Write<char>(1);//Protocol version
-			buffer.Write<char>(EET_CLIENT_HANDSHAKE);//Event type
-
-			m_socket->Send(packetData, 2);
 
 			return true;
 		}

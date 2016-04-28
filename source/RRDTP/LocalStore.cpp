@@ -148,6 +148,55 @@ Entry* LocalStore::Create(HostID owner, const char* identifier, E_DATA_TYPE type
 	return entry;
 }
 
+void LocalStore::Delete(const char* identifier)
+{
+	if (identifier == NULL)
+	{
+		return;
+	}
+
+	Category* category = &m_rootCategory;
+	Entry* entry = NULL;
+
+	char* identifierCopy = strdup(identifier);
+
+	//Loop over tokens
+	char* nextToken = NULL;
+	char* token = strtok(identifierCopy, ".");
+	while (token != NULL)
+	{
+		//The next token is retrieved first so that we know which one is the last one.
+		nextToken = strtok(NULL, ".");
+
+		//If we haven't reached the last token, then the current one is a category.
+		if (nextToken != NULL)
+		{
+			category = category->GetSubcategory(token);
+		}
+		//Otherwise we've reached the value.
+		else
+		{
+			//Iterate through and delete
+			List<Entry*>& entries = category->GetEntries();
+			List<Entry*>::Node* n = entries.Begin();
+			while (n != NULL)
+			{
+				if (n->GetValue()->GetName() == token)
+				{
+					delete n->GetValue();
+					entries.Erase(n);
+					return;
+				}
+
+				n = n->GetNext();
+			}
+		}
+
+		//Next token becomes current token for next loop iteration.
+		token = nextToken;
+	}
+}
+
 Entry* LocalStore::Get(const char* identifier)
 {
 	if (identifier == NULL)
