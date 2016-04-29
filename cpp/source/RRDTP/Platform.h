@@ -6,6 +6,7 @@
 #define RRDTP_PLATFORM_WINDOWS
 #elif defined(unix) || defined(__unix__) || defined(__unix) || defined(__APPLE__)
 #define RRDTP_PLATFORM_UNIX
+
 #endif
 
 //JNI Wrapper - comment this out to disable building the JNI wrapper

@@ -83,10 +83,7 @@ Connection::Connection()
 
 Connection::~Connection()
 {
-	if (m_socket != NULL)
-	{
-		delete m_socket;
-	}
+	Close();
 }
 
 void Connection::StartServer(unsigned int port)
@@ -110,6 +107,16 @@ bool Connection::StartClient(const char* ip, unsigned int port)
 	}
 
 	return false;
+}
+
+void Connection::Close()
+{
+	if (m_socket != NULL)
+	{
+		m_socket->Close();
+		delete m_socket;
+		m_socket = NULL;
+	}
 }
 
 void Connection::SendUpdatePacket(Entry* entry, HostID target)

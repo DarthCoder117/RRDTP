@@ -28,6 +28,9 @@ namespace rrdtp
 		///@return True if the connection attempt was successful. False if the connection failed.
 		bool StartClient(const char* ip, unsigned int port = 4309);
 
+		///@brief Closes the connection.
+		void Close();
+
 		///@brief Set a 32-bit integer value to be sent to all subscribed systems (client or server).
 		///@param identifier A valid value identifier.
 		///@param val The value to set.
