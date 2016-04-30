@@ -75,6 +75,14 @@ namespace rrdtp
 		///@return A pointer to a copy of the retrieved value. The caller is responsible for ensuring that delete[] is called when finished with the value.
 		const char* GetString(const char* identifier, const char* defaultVal = "");
 
+		///@brief Gets an entry directly. 
+		///@return A pointer to the entry, or NULL if it doesn't exist.
+		Entry* GetEntry(const char* identifier);
+
+		///@brief Gets a category.
+		///@return A pointer to the category, or NULL if it doesn't exist.
+		Category* GetCategory(const char* identifier);
+
 		///@brief Deletes an entry.
 		///@param identifier A valid value identifier.
 		void Delete(const char* identifier);

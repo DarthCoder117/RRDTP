@@ -306,6 +306,16 @@ const char* Connection::GetString(const char* identifier, const char* defaultVal
 	return defaultVal;
 }
 
+Entry* Connection::GetEntry(const char* identifier)
+{
+	return m_localDataStore.Get(identifier);
+}
+
+Category* Connection::GetCategory(const char* identifier)
+{
+	return NULL;//TODO: Search for category
+}
+
 void Connection::Delete(const char* identifier)
 {
 	if (m_localDataStore.Delete(identifier))

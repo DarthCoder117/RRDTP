@@ -194,7 +194,7 @@ void StringEntry::Set(const char* str)
 	EnsureCapacity(length);
 
 	//Copy to internal string
-	strcpy(m_string, str);
+	memcpy(m_string, str, length);
 }
 
 const char* StringEntry::Get()

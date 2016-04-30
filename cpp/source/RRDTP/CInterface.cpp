@@ -2,6 +2,7 @@
 
 extern "C"
 {
+	//Connection
 	rrdtp_Connection* rrdtp_OpenServerConnection(unsigned int port)
 	{
 		rrdtp::Connection* connection = new rrdtp::Connection();
@@ -20,4 +21,11 @@ extern "C"
 	{
 		delete (rrdtp::Connection*)connection;
 	}
+
+	void rrdtp_PollConnection(rrdtp_Connection* connection)
+	{
+		((rrdtp::Connection*)connection)->Poll();
+	}
+
+	//Entries
 }

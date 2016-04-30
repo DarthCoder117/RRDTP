@@ -5,10 +5,15 @@
  */
 package edu.cwu.rrdtp;
 
+import com.sun.jna.Library;
+import com.sun.jna.Native;
+import com.sun.jna.Platform;
+
 /**
  *
  * @author super
  */
-public class Entry {
+public class Entry 
+{
     
 }
