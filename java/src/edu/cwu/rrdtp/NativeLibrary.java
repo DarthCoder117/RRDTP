@@ -7,6 +7,7 @@ package edu.cwu.rrdtp;
 
 import com.sun.jna.Library;
 import com.sun.jna.Native;
+import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.Platform;
 
@@ -21,6 +22,17 @@ public class NativeLibrary
     public static native void rrdtp_PollConnection(Pointer connection);
     
     //Entries
+    public static native void rrdtp_SetInt(Pointer connection, String identifier, int val);
+    public static native int rrdtp_GetInt(Pointer connection, String identifier, int defaultVal);
+
+    public static native void rrdtp_SetLong(Pointer connection, String identifier, NativeLong val);
+    public static native NativeLong rrdtp_GetLong(Pointer connection, String identifier, NativeLong defaultVal);
+
+    public static native void rrdtp_SetBool(Pointer connection, String identifier, boolean val);
+    public static native boolean rrdtp_GetBool(Pointer connection, String identifier, boolean defaultVal);
+
+    public static native void rrdtp_SetString(Pointer connection, String identifier, String str);
+    public static native String rrdtp_GetString(Pointer connection, String identifier, String defaultVal);
     
     static
     {
