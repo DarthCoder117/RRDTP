@@ -1,5 +1,6 @@
 #ifndef Types_H
 #define Types_H
+#include <stdint.h>
 
 #define RRDTP_VERSION 1
 

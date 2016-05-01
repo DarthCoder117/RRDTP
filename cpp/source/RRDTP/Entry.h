@@ -55,9 +55,9 @@ namespace rrdtp
 
 		E_DATA_TYPE GetType() { return EDT_INT; }
 
-		void Set(int integer);
+		void Set(int32_t integer);
 
-		int Get();
+		int32_t Get();
 
 		void Serialize(DataBuffer& out);
 
@@ -65,7 +65,7 @@ namespace rrdtp
 
 	private:
 
-		int m_integer;
+		int32_t m_integer;
 	};
 
 	///@brief Entry used for holding 32-bit integer data.
@@ -77,9 +77,9 @@ namespace rrdtp
 
 		E_DATA_TYPE GetType() { return EDT_LONG; }
 
-		void Set(long integer);
+		void Set(int64_t integer);
 
-		long Get();
+		int64_t Get();
 
 		void Serialize(DataBuffer& out);
 
@@ -87,7 +87,7 @@ namespace rrdtp
 
 	private:
 
-		long m_integer;
+		int64_t m_integer;
 	};
 
 	///@brief Entry used for holding boolean data.

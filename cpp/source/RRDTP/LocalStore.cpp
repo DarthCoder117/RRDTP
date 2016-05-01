@@ -120,7 +120,9 @@ Entry* LocalStore::Create(HostID owner, const char* identifier, E_DATA_TYPE type
 	Entry* entry = NULL;
 
 	//Create copy of string to tokenize.
-	char* identifierCopy = strdup(identifier);
+	int identifierLen = strlen(identifier);
+	char* identifierCopy = new char[identifierLen];
+	memcpy(identifierCopy, identifier, identifierLen);
 
 	//Loop over tokens
 	char* nextToken = NULL;
@@ -145,6 +147,8 @@ Entry* LocalStore::Create(HostID owner, const char* identifier, E_DATA_TYPE type
 		token = nextToken;
 	}
 
+	delete[] identifierCopy;
+
 	return entry;
 }
 
@@ -158,7 +162,9 @@ bool LocalStore::Delete(const char* identifier)
 	Category* category = &m_rootCategory;
 	Entry* entry = NULL;
 
-	char* identifierCopy = strdup(identifier);
+	int identifierLen = strlen(identifier);
+	char* identifierCopy = new char[identifierLen];
+	memcpy(identifierCopy, identifier, identifierLen);
 
 	//Loop over tokens
 	char* nextToken = NULL;
@@ -185,6 +191,9 @@ bool LocalStore::Delete(const char* identifier)
 				{
 					delete n->GetValue();
 					entries.Erase(n);
+
+					delete[] identifierCopy;
+
 					return true;
 				}
 
@@ -195,6 +204,8 @@ bool LocalStore::Delete(const char* identifier)
 		//Next token becomes current token for next loop iteration.
 		token = nextToken;
 	}
+
+	delete[] identifierCopy;
 
 	return false;
 }
@@ -209,7 +220,9 @@ Entry* LocalStore::Get(const char* identifier)
 	Category* category = &m_rootCategory;
 	Entry* entry = NULL;
 
-	char* identifierCopy = strdup(identifier);
+	int identifierLen = strlen(identifier);
+	char* identifierCopy = new char[identifierLen];
+	memcpy(identifierCopy, identifier, identifierLen);
 
 	//Loop over tokens
 	char* nextToken = NULL;
@@ -233,6 +246,8 @@ Entry* LocalStore::Get(const char* identifier)
 		//Next token becomes current token for next loop iteration.
 		token = nextToken;
 	}
+
+	delete[] identifierCopy;
 
 	return entry;
 }

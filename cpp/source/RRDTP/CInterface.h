@@ -1,6 +1,7 @@
 #ifndef CInterface_H
 #define CInterface_H
 #ifdef  __cplusplus
+#include "RRDTP/Types.h"
 #include "RRDTP/Connection.h"
 #include "RRDTP/Entry.h"
 #endif
@@ -22,8 +23,8 @@ extern "C"
 	void rrdtp_SetInt(rrdtp_Connection* connection, const char* identifier, int val);
 	int rrdtp_GetInt(rrdtp_Connection* connection, const char* identifier, int defaultVal);
 
-	void rrdtp_SetLong(rrdtp_Connection* connection, const char* identifier, long val);
-	long rrdtp_GetLong(rrdtp_Connection* connection, const char* identifier, long defaultVal);
+	void rrdtp_SetLong(rrdtp_Connection* connection, const char* identifier, int64_t val);
+	int64_t rrdtp_GetLong(rrdtp_Connection* connection, const char* identifier, int64_t defaultVal);
 
 	void rrdtp_SetBool(rrdtp_Connection* connection, const char* identifier, bool val);
 	bool rrdtp_GetBool(rrdtp_Connection* connection, const char* identifier, bool defaultVal);

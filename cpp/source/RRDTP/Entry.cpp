@@ -73,25 +73,25 @@ IntEntry::IntEntry(HostID owner, const char* identifier)
 	m_integer(0)
 {}
 
-void IntEntry::Set(int integer)
+void IntEntry::Set(int32_t integer)
 {
 	m_integer = integer;
 }
 
-int IntEntry::Get()
+int32_t IntEntry::Get()
 {
 	return m_integer;
 }
 
 void IntEntry::Serialize(DataBuffer& out)
 {
-	out.Write<int>(htonl(m_integer));
+	out.Write<int32_t>(htonl(m_integer));
 }
 
 void IntEntry::Deserialize(DataBuffer& in)
 {
 	int val = 0;
-	if (in.Read<int>(val))
+	if (in.Read<int32_t>(val))
 	{
 		m_integer = ntohl(val);
 	}
@@ -106,27 +106,27 @@ LongEntry::LongEntry(HostID owner, const char* identifier)
 	m_integer(0)
 {}
 
-void LongEntry::Set(long integer)
+void LongEntry::Set(int64_t integer)
 {
 	m_integer = integer;
 }
 
-long LongEntry::Get()
+int64_t LongEntry::Get()
 {
 	return m_integer;
 }
 
 void LongEntry::Serialize(DataBuffer& out)
 {
-	out.Write<long>(htonl(m_integer));
+	out.Write<int64_t>(htonll(m_integer));
 }
 
 void LongEntry::Deserialize(DataBuffer& in)
 {
-	long val = 0;
-	if (in.Read<long>(val))
+	int64_t val = 0;
+	if (in.Read<int64_t>(val))
 	{
-		m_integer = ntohl(val);
+		m_integer = ntohll(val);
 	}
 }
 
@@ -151,13 +151,13 @@ bool BooleanEntry::Get()
 
 void BooleanEntry::Serialize(DataBuffer& out)
 {
-	out.Write<char>(m_boolean);
+	out.Write<uint8_t>(m_boolean);
 }
 
 void BooleanEntry::Deserialize(DataBuffer& in)
 {
-	char val = 0;
-	if (in.Read<char>(val))
+	uint8_t val = 0;
+	if (in.Read<uint8_t>(val))
 	{
 		m_boolean = (val != 0);
 	}
@@ -204,16 +204,16 @@ const char* StringEntry::Get()
 
 void StringEntry::Serialize(DataBuffer& out)
 {
-	short len = (unsigned short)strlen(m_string);
-	out.Write<unsigned short>(len);
+	uint16_t len = (uint16_t)strlen(m_string);
+	out.Write<uint16_t>(len);
 
 	out.Write((const unsigned char*)m_string, len);
 }
 
 void StringEntry::Deserialize(DataBuffer& in)
 {
-	unsigned short len = 0;
-	in.Read<unsigned short>(len);
+	uint16_t len = 0;
+	in.Read<uint16_t>(len);
 
 	EnsureCapacity(len);
 	in.Read((const unsigned char*)m_string, len);

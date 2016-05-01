@@ -37,11 +37,11 @@ extern "C"
 		return ((rrdtp::Connection*)connection)->GetInt(identifier, defaultVal);
 	}
 
-	void rrdtp_SetLong(rrdtp_Connection* connection, const char* identifier, long val)
+	void rrdtp_SetLong(rrdtp_Connection* connection, const char* identifier, int64_t val)
 	{
 		((rrdtp::Connection*)connection)->SetLong(identifier, val);
 	}
-	long rrdtp_GetLong(rrdtp_Connection* connection, const char* identifier, long defaultVal)
+	int64_t rrdtp_GetLong(rrdtp_Connection* connection, const char* identifier, int64_t defaultVal)
 	{
 		return ((rrdtp::Connection*)connection)->GetLong(identifier, defaultVal);
 	}

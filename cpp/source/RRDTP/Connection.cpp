@@ -200,7 +200,7 @@ void Connection::SynchronizeAllEntriesImplementation(Category* start, HostID cli
 	}
 }
 
-void Connection::SetInt(const char* identifier, int val)
+void Connection::SetInt(const char* identifier, int32_t val)
 {
 	//Create/retrieve entry (id doesn't matter locally).
 	IntEntry* entry = (IntEntry*)m_localDataStore.Create(-1, identifier, EDT_INT);
@@ -213,7 +213,7 @@ void Connection::SetInt(const char* identifier, int val)
 	}
 }
 
-int Connection::GetInt(const char* identifier, int defaultVal)
+int32_t Connection::GetInt(const char* identifier, int32_t defaultVal)
 {
 	//Retrieve entry
 	Entry* entry = m_localDataStore.Get(identifier);
@@ -226,7 +226,7 @@ int Connection::GetInt(const char* identifier, int defaultVal)
 	return defaultVal;
 }
 
-void Connection::SetLong(const char* identifier, long val)
+void Connection::SetLong(const char* identifier, int64_t val)
 {
 	//Create/retrieve entry (id doesn't matter locally).
 	LongEntry* entry = (LongEntry*)m_localDataStore.Create(-1, identifier, EDT_LONG);
@@ -239,7 +239,7 @@ void Connection::SetLong(const char* identifier, long val)
 	}
 }
 
-long Connection::GetLong(const char* identifier, long defaultVal)
+int64_t Connection::GetLong(const char* identifier, int64_t defaultVal)
 {
 	//Retrieve entry
 	Entry* entry = m_localDataStore.Get(identifier);
