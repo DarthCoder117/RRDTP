@@ -40,8 +40,7 @@ extern "C"
 
 	void rrdtp_CloseConnection(rrdtp_Connection* connection);
 
-	void rrdtp_PollConnection(rrdtp_
-	Connection* connection);
+	void rrdtp_PollConnection(rrdtp_Connection* connection);
 
 	//Entries
 	void rrdtp_SetInt(rrdtp_Connection* connection, const char* identifier, int val);

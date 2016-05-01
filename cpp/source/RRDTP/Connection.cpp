@@ -156,7 +156,7 @@ void Connection::SendUpdatePacket(Entry* entry, HostID target)
 		DataBuffer buffer(packetData, 512);
 
 		//Write header for set packet
-		buffer.Write<char>(1);//Protocol version
+		buffer.Write<char>(RRDTP_PROTOCOL_VERSION);//Protocol version
 		buffer.Write<char>(EET_SET);//Event type
 
 		buffer.Write<char>((char)identifierLength);//Value identifier length
@@ -195,7 +195,7 @@ void Connection::SendDeletionPacket(const char* identifier)
 	DataBuffer buffer(packetData, 512);
 
 	//Write header for set packet
-	buffer.Write<char>(1);//Protocol version
+	buffer.Write<char>(RRDTP_PROTOCOL_VERSION);//Protocol version
 	buffer.Write<char>(EET_DELETE);//Event type
 
 	buffer.Write<char>((char)identifierLength);//Value identifier length

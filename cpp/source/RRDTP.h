@@ -25,6 +25,9 @@ SOFTWARE.
 #ifndef RRDTP_H
 #define RRDTP_H
 
+#define RRDTP_VERSION_MAJOR 1
+#define RRDTP_VERSION_MINOR 0
+
 #include "RRDTP/Platform.h"
 #include "RRDTP/Types.h"
 #include "RRDTP/Sockets/Socket.h"

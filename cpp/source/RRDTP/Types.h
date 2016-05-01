@@ -25,7 +25,8 @@ SOFTWARE.
 #define Types_H
 #include <stdint.h>
 
-#define RRDTP_VERSION 1
+///@brief The RRDTP protocol version (different from library version)
+#define RRDTP_PROTOCOL_VERSION 1
 
 namespace rrdtp
 {
