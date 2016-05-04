@@ -35,4 +35,15 @@ SOFTWARE.
 //JNI Wrapper - comment this out to disable building the JNI wrapper
 #define BUILD_JAVA_INTERFACE
 
+//hton/ntoh
+#if defined(RRDTP_PLATFORM_WINDOWS)
+#include <Winsock2.h>
+#elif defined(RRDTP_PLATFORM_UNIX)
+#include <arpa/inet.h>
+#define ntohll(x) htobe64(x)
+#define htonll(x) be64toh(x)
+#define htonf(x) htobe64(x)
+#define ntohf(x) be64toh(x)
+#endif
+
 #endif
