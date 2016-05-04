@@ -30,6 +30,8 @@ SOFTWARE.
 #include <windows.h>
 #include <stdio.h>
 #pragma comment(lib,"ws2_32.lib")
+#elif defined(RRDTP_PLATFORM_UNIX)
+#include <arpa/inet.h>
 #endif
 
 using namespace rrdtp;

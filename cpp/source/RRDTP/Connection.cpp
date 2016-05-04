@@ -26,7 +26,6 @@ SOFTWARE.
 #include "RRDTP/DataBuffer.h"
 #include "RRDTP/Entry.h"
 #include <sstream>
-#include <cinttypes>
 #ifdef RRDTP_PLATFORM_WINDOWS
 #include <Winsock2.h>
 #endif
