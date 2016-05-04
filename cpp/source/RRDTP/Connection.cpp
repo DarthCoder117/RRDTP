@@ -275,6 +275,58 @@ int64_t Connection::GetLong(const char* identifier, int64_t defaultVal)
 	return defaultVal;
 }
 
+void Connection::SetFloat(const char* identifier, float val)
+{
+	//Create/retrieve entry (id doesn't matter locally).
+	FloatEntry* entry = (FloatEntry*)m_localDataStore.Create(-1, identifier, EDT_FLOAT);
+	if (entry != NULL)
+	{
+		//Update the entry
+		entry->Set(val);
+
+		SendUpdatePacket(entry);
+	}
+}
+
+float Connection::GetFloat(const char* identifier, float defaultVal)
+{
+	//Retrieve entry
+	Entry* entry = m_localDataStore.Get(identifier);
+	if (entry != NULL && entry->GetType() == EDT_FLOAT)
+	{
+		//Return the value
+		return ((FloatEntry*)entry)->Get();
+	}
+
+	return defaultVal;
+}
+
+void Connection::SetDouble(const char* identifier, double val)
+{
+	//Create/retrieve entry (id doesn't matter locally).
+	DoubleEntry* entry = (DoubleEntry*)m_localDataStore.Create(-1, identifier, EDT_DOUBLE);
+	if (entry != NULL)
+	{
+		//Update the entry
+		entry->Set(val);
+
+		SendUpdatePacket(entry);
+	}
+}
+
+double Connection::GetDouble(const char* identifier, double defaultVal)
+{
+	//Retrieve entry
+	Entry* entry = m_localDataStore.Get(identifier);
+	if (entry != NULL && entry->GetType() == EDT_DOUBLE)
+	{
+		//Return the value
+		return ((DoubleEntry*)entry)->Get();
+	}
+
+	return defaultVal;
+}
+
 void Connection::SetBool(const char* identifier, bool val)
 {
 	//Create/retrieve entry (id doesn't matter locally).

@@ -113,6 +113,50 @@ namespace rrdtp
 		int64_t m_integer;
 	};
 
+	///@brief Entry used for holding 32-bit floating point data.
+	class FloatEntry : public Entry
+	{
+	public:
+
+		FloatEntry(HostID owner, const char* identifier);
+
+		E_DATA_TYPE GetType() { return EDT_LONG; }
+
+		void Set(float f);
+
+		float Get();
+
+		void Serialize(DataBuffer& out);
+
+		void Deserialize(DataBuffer& in);
+
+	private:
+
+		float m_float;
+	};
+
+	///@brief Entry used for holding 64-bit floating point data.
+	class DoubleEntry : public Entry
+	{
+	public:
+
+		DoubleEntry(HostID owner, const char* identifier);
+
+		E_DATA_TYPE GetType() { return EDT_LONG; }
+
+		void Set(double d);
+
+		double Get();
+
+		void Serialize(DataBuffer& out);
+
+		void Deserialize(DataBuffer& in);
+
+	private:
+
+		double m_double;
+	};
+
 	///@brief Entry used for holding boolean data.
 	class BooleanEntry : public Entry
 	{
@@ -163,6 +207,40 @@ namespace rrdtp
 		size_t m_capacity;
 
 		char* m_string;
+	};
+
+	///@brief Entry for holding unformatted data (anything the client wishes to send).
+	class UnformattedEntry : public Entry
+	{
+	public:
+
+		UnformattedEntry(HostID owner, const char* identifier);
+
+		~UnformattedEntry();
+
+		E_DATA_TYPE GetType() { return EDT_STRING; }
+
+		///@brief Sets the data in the entry.
+		void Set(char* data, size_t dataSz);
+
+		///@brief Returns the data in the entry.
+		char* Get();
+
+		///@brief Returns the size of the data in the entry.
+		size_t GetSize();
+
+		void Serialize(DataBuffer& out);
+
+		void Deserialize(DataBuffer& in);
+
+	private:
+
+		void EnsureCapacity(size_t sz);
+
+		size_t m_capacity;
+
+		char* m_data;
+		size_t m_dataSz;
 	};
 }
 

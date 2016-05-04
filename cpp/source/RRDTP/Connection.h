@@ -76,6 +76,28 @@ namespace rrdtp
 		///@return The retrieved value.
 		int64_t GetLong(const char* identifier, int64_t defaultVal = 0);
 
+		///@brief Set a 32-bit floating point value to be sent to all subscribed systems (client or server).
+		///@param identifier A valid value identifier.
+		///@param val The value to set.
+		void SetFloat(const char* identifier, float val);
+		///@brief Get the most recent 32-bit floating point value with the specified identifer (client or server).
+		///If this is a client, then the client must either own the value, or be subscribed to it for this method to work.
+		///@param identifier A valid value identifier.
+		///@param defaultVal The default value that will be returned if the identified value was not found.
+		///@return The retrieved value.
+		float GetFloat(const char* identifier, float defaultVal = 0.0f);
+
+		///@brief Set a 64-bit floating point value to be sent to all subscribed systems (client or server).
+		///@param identifier A valid value identifier.
+		///@param val The value to set.
+		void SetDouble(const char* identifier, double val);
+		///@brief Get the most recent 64-bit floating point value with the specified identifer (client or server).
+		///If this is a client, then the client must either own the value, or be subscribed to it for this method to work.
+		///@param identifier A valid value identifier.
+		///@param defaultVal The default value that will be returned if the identified value was not found.
+		///@return The retrieved value.
+		double GetDouble(const char* identifier, double defaultVal = 0.0);
+
 		///@brief Set a boolean value to be sent to all subscribed systems (client or server).
 		///@param identifier A valid value identifier.
 		///@param val The value to set.
