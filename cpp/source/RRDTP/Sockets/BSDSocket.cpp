@@ -64,8 +64,7 @@ E_SOCKET_ERROR BSDSocket::Connect(const char *ip, unsigned int port, E_SOCKET_PR
 E_SOCKET_ERROR BSDSocket::Listen(unsigned int port, E_SOCKET_PROTOCOL protocol)
 {
 
-    if ( bind(m_SocketFD, (struct sockaddr *) &socketInfo, sizeof(struct sockaddr_in) < 0))
-    {
+    if (bind(m_SocketFD, (struct sockaddr *) &socketInfo, sizeof(struct sockaddr_in) < 0)) {
         close(m_SocketFD);
         perror("bind");
         exit(EXIT_FAILURE);
@@ -73,35 +72,123 @@ E_SOCKET_ERROR BSDSocket::Listen(unsigned int port, E_SOCKET_PROTOCOL protocol)
 
     server.sin_addr.s_addr = htonl(INADDR_ANY);
     server.sin_family = AF_INET;
-    server.sin_port = htons(portNumber);
+    server.sin_port = htons(port);
 
     int socketConnection;
 
-    if ((socketConnection = accept(m_SocketFD, NULL, NULL)) < 0)
-    {
+    if ((socketConnection = accept(m_SocketFD, NULL, NULL)) < 0) {
         close(m_SocketFD);
         exit(EXIT_FAILURE);
+    }
+
+}
+
+    bool BSDSocket ::IsServer()
+    {
+        return m_isServer;
     }
 
 
    HostID BSDSocket::Accept(E_SOCKET_ERROR *errorCodeOut)
     {
+        int newSocket;
+        struct sockaddr_in client;
+        int c = sizeof(client);
+
+        newSocket = accept(m_SocketFD, (struct sockaddr *)&client, (socklen_t *) &c);
+
+        if (newSocket < 0)
+        {
+            if (errorCodeOut)
+            {
+                *errorCodeOut = ESE_FAILURE;
+            }
+            return -1;
+        }
+
+        if(errorCodeOut)
+        {
+            *errorCodeOut = ESE_SUCCESS;
+        }
+
+
+        return size_t(newSocket);
+
 
 
 
     }
 
-    /**HostID BSDSocket::Send(const void *data, size_t sz, HostID hostID)
+    HostID BSDSocket::Write(const void *data, size_t sz, HostID hostID)
     {
 
+        if (m_isServer)
+        {
+            return write(hostID, (const char*)data, sz);
+        }
 
-    }*/
+        return write(m_SocketFD, (const char*)data, sz);
 
-    void BSDSocket :: Close(int socket){
 
-        Close(m_SocketFD);
     }
 
+HostID BSDSocket :: Read(const void *data, size_t sz, HostID hostID)
+
+{
+    int readCount = 0;
+    int count = 0;
+    int numToRead = 32;
+
+
+
+    while(count < numToRead)
+    {
+        if(readCount == read(m_SocketFD, (void *) data, sz - hostID))
+        {
+            count += readCount;
+            data += readCount;
+
+        }
+        else if(readCount < 0)
+        {
+            close(m_SocketFD);
+            exit(EXIT_FAILURE);
+        }
+
+        printf("Numbers of bytes read: %d " , count );
+
+
+    }
+
+
+
+
 }
+
+
+
+
+
+    void BSDSocket :: Close(int socket)
+    {
+
+        //Close(m_SocketFD);
+    }
+
+/**void BSDSocket::Poll() {
+    if (m_SocketFD != NULL) {
+        if (m_isServer) {
+            pollServer();
+        }
+        else {
+            pollClient();
+        }
+    }
+}*/
+
+
+
+
+
 
 #endif
