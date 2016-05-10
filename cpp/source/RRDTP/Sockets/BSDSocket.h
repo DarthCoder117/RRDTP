@@ -74,9 +74,13 @@ namespace rrdtp
 
         HostID Read(const void *data, size_t sz, HostID hostID);
 
-        static void Close(int i);
+	size_t Send(const void* data, size_t sz, HostID host);
+		
+	void SendAll(const void* data, size_t sz);
 
-		void Poll();
+        void Close();
+
+	void Poll();
 
 
     private:

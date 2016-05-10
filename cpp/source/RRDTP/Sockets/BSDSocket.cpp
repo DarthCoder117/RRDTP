@@ -21,9 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ==============================================================================*/
-#ifdef RRDTP_PLATFORM_UNIX
-#include <sys/proc_info.h>
-#include "BSDSocket.h"
+#include "RRDTP/Sockets/BSDSocket.h"
+#if defined(RRDTP_PLATFORM_UNIX)
 
 using namespace rrdtp;
 
@@ -35,11 +34,9 @@ BSDSocket::BSDSocket(DataRecievedCallback dataRecievedCallback, void* userPtr, C
     :Socket(dataRecievedCallback, userPtr, connectionAcceptedCallback)
 
 {
-
-    IsServer();
-
+   
 }
-		
+
 BSDSocket::~BSDSocket()
 {
 
@@ -47,19 +44,19 @@ BSDSocket::~BSDSocket()
 
 E_SOCKET_ERROR BSDSocket::Establish(E_SOCKET_PROTOCOL protocol)
 {
-
     if ((m_SocketFD = socket(AF_INET,SOCK_STREAM,protocol)) == -1)
     {
-        close(m_SocketFD);
-        exit(EXIT_FAILURE);
+	printf("Error creating socket.\n");
+        return ESE_FAILURE;
     }
 
-
+    return ESE_SUCCESS;
 }
-
 
 E_SOCKET_ERROR BSDSocket::Connect(const char *ip, unsigned int port, E_SOCKET_PROTOCOL protocol)
 {
+	Establish(protocol);
+
     bzero(&remoteSocketInfo, sizeof(HostID));
 
     gethostname(sysHost, MAXHOSTNAME);
@@ -85,8 +82,10 @@ E_SOCKET_ERROR BSDSocket::Connect(const char *ip, unsigned int port, E_SOCKET_PR
 
 E_SOCKET_ERROR BSDSocket::Listen(unsigned int port, E_SOCKET_PROTOCOL protocol)
 {
-
-    if (bind(m_SocketFD, (struct sockaddr *) &socketInfo, sizeof(struct sockaddr_in) < 0)) {
+	Establish(protocol);
+	
+    if (bind(m_SocketFD, (struct sockaddr *) &socketInfo, sizeof(struct sockaddr_in) < 0))
+    {
         close(m_SocketFD);
         perror("bind");
         exit(EXIT_FAILURE);
@@ -99,6 +98,7 @@ E_SOCKET_ERROR BSDSocket::Listen(unsigned int port, E_SOCKET_PROTOCOL protocol)
     int socketConnection;
 
     if ((socketConnection = accept(m_SocketFD, NULL, NULL)) < 0) {
+
         close(m_SocketFD);
         exit(EXIT_FAILURE);
     }
@@ -188,29 +188,33 @@ HostID BSDSocket :: Read(const void *data, size_t sz, HostID hostID)
 }
 
 
+size_t BSDSocket::Send(const void* data, size_t sz, HostID host)
+{
+	return 0;
+}
+		
+void BSDSocket::SendAll(const void* data, size_t sz)
+{
+
+}
 
 
-
-    void BSDSocket :: Close(int socket)
+    void BSDSocket :: Close()
     {
 
         //Close(m_SocketFD);
     }
 
-/**void BSDSocket::Poll() {
-    if (m_SocketFD != NULL) {
+void BSDSocket::Poll() {
+    /*if (m_SocketFD != NULL) {
         if (m_isServer) {
             pollServer();
         }
         else {
             pollClient();
         }
-    }
-}*/
-
-
-
-
+    }*/
+}
 
 
 #endif

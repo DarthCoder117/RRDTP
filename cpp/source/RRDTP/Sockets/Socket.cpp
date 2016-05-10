@@ -26,7 +26,7 @@ SOFTWARE.
 
 #if defined(RRDTP_PLATFORM_WINDOWS)
 #include "RRDTP/Sockets/WinsockSocket.h"
-#elif defined(RRDTP_PLATFORM_LINUX)
+#elif defined(RRDTP_PLATFORM_UNIX)
 #include "RRDTP/Sockets/BSDSocket.h"
 #endif
 
@@ -36,7 +36,7 @@ Socket* Socket::Create(DataRecievedCallback dataRecievedCallback, void* userPtr,
 {
 	#if defined(RRDTP_PLATFORM_WINDOWS)
 	return new WinsockSocket(dataRecievedCallback, userPtr, connectionAcceptedCallback);
-	#elif defined(RRDTP_PLATFORM_LINUX)
+	#elif defined(RRDTP_PLATFORM_UNIX)
 	return new BSDSocket(dataRecievedCallback, userPtr, connectionAcceptedCallback);
 	#endif
 }
