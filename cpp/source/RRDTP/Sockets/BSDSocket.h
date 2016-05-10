@@ -70,14 +70,20 @@ namespace rrdtp
 
         HostID Accept(E_SOCKET_ERROR* errorCodeOut=NULL);
 
-        static void Close(int i);
+        HostID Write(const void *data, size_t sz, HostID hostID);
 
-		//int Send(int s, void *buffer, UINT32_MAX numBytes);
+        HostID Read(const void *data, size_t sz, HostID hostID);
+
+        static void Close(int i);
 
 		void Poll();
 
 
     private:
+
+        void pollServer();
+        void pollClient();
+
 
 		char sysHost [MAXHOSTNAME+1];
 		struct sockaddr_in server;
@@ -85,9 +91,10 @@ namespace rrdtp
         struct sockaddr_in socketAddress;
         struct sockaddr_in remoteSocketInfo;
         struct sockaddr_in socketInfo;
-        int ip, m_socket;
         struct hostNamePtr *hostNamePtr1;
+        int ip, m_socket;
         HostID remoteHost;
+		bool m_isServer;
 
 
 
