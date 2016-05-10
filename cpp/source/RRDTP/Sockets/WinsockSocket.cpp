@@ -146,6 +146,13 @@ HostID WinsockSocket::Accept(E_SOCKET_ERROR* errorCodeOut)
 	int c = sizeof(client);
 
 	newSocket = accept(m_socket, (struct sockaddr *)&client, &c);
+    if (newSocket == INVALID_SOCKET)
+    {
+		if (errorCodeOut)
+		{
+			*errorCodeOut = ESE_FAILURE;
+		}
+		return -1;
     }
 	
 	if (errorCodeOut)
