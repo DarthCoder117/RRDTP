@@ -52,13 +52,14 @@ E_SOCKET_ERROR BSDSocket::CommonInit(E_SOCKET_PROTOCOL protocol)
 		p = IPPROTO_UDP;
 	}
 
-	m_socket = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, p);
-    if (m_socket == -1)
-    {
-        return ESE_FAILURE;
-    }
+	m_socket = socket(AF_INET, SOCK_STREAM, p);
+	perror("Socket");
+	if (m_socket == -1)
+	{
+		return ESE_FAILURE;
+	}
 
-    return ESE_SUCCESS;
+	return ESE_SUCCESS;
 }
 
 E_SOCKET_ERROR BSDSocket::Connect(const char *ip, unsigned int port, E_SOCKET_PROTOCOL protocol)
@@ -69,12 +70,13 @@ E_SOCKET_ERROR BSDSocket::Connect(const char *ip, unsigned int port, E_SOCKET_PR
 	}
 
 	struct sockaddr_in server;
-
+	memset(&server, 0, sizeof(server));
 	server.sin_addr.s_addr = inet_addr(ip);
 	server.sin_family = AF_INET;
 	server.sin_port = htons(port);
 
 	int err = connect(m_socket, (struct sockaddr*)&server, sizeof(server));
+	perror("Connect");
 	if (err < 0)
 	{
 		return ESE_FAILURE;
@@ -83,7 +85,7 @@ E_SOCKET_ERROR BSDSocket::Connect(const char *ip, unsigned int port, E_SOCKET_PR
 	m_isServer = false;
 	return ESE_SUCCESS;
 }
-
+#include <iostream>
 E_SOCKET_ERROR BSDSocket::Listen(unsigned int port, E_SOCKET_PROTOCOL protocol)
 {
 	if (CommonInit(protocol) != ESE_SUCCESS)
@@ -92,18 +94,22 @@ E_SOCKET_ERROR BSDSocket::Listen(unsigned int port, E_SOCKET_PROTOCOL protocol)
 	}
 	
 	struct sockaddr_in server;
-
+	memset(&server, 0, sizeof(server));
 	server.sin_addr.s_addr = INADDR_ANY;
 	server.sin_family = AF_INET;
-	server.sin_port = htons(port);
+	server.sin_port = port;
 
-    if (bind(m_socket, (struct sockaddr*)&server, sizeof(server) < 0))
-    {
-        close(m_socket);
+	int res = bind(m_socket, (struct sockaddr*)&server, sizeof(server));
+	perror("Bind");
+	if (res < 0)
+	{
+		close(m_socket);
 		return ESE_FAILURE;
-    }
+	}
 
-	if (listen(m_socket, 3) < 0)
+	res = listen(m_socket, 3);
+	perror("Listen");
+	if (res < 0)
 	{
 		return ESE_FAILURE;
 	}
