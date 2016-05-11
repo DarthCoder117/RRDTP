@@ -26,10 +26,6 @@ SOFTWARE.
 
 using namespace rrdtp;
 
-static int portNumber = 8080;
-static int m_SocketFD;
-
-
 BSDSocket::BSDSocket(DataRecievedCallback dataRecievedCallback, void* userPtr, ConnectionAcceptedCallback connectionAcceptedCallback)
     :Socket(dataRecievedCallback, userPtr, connectionAcceptedCallback),
 	m_isServer(false),
@@ -297,7 +293,7 @@ void BSDSocket::PollClient()
 	timeout.tv_sec = 0;
 	timeout.tv_usec = 0;
 
-	int numReady = select(0, &m_readFDS, NULL, NULL, &timeout);
+	int numReady = select(m_socket+1, &m_readFDS, NULL, NULL, &timeout);
 	if (numReady != -1 && numReady > 0)
 	{
 		int recievedDataSz = recv(m_socket, data, 2000, 0);

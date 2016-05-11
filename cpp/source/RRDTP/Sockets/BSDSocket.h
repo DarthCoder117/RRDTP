@@ -84,15 +84,7 @@ namespace rrdtp
         void PollServer();
         void PollClient();
 
-		char sysHost [MAXHOSTNAME+1];
-		struct sockaddr_in server;
-        struct hostent *hPtr;
-        struct sockaddr_in socketAddress;
-        struct sockaddr_in remoteSocketInfo;
-        
-        struct hostNamePtr *hostNamePtr1;
-        int ip, m_socket;
-        HostID remoteHost;
+        int m_socket;
 		bool m_isServer;
 
         std::list<int> m_connectedClients;
