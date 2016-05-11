@@ -266,8 +266,8 @@ void BSDSocket::PollServer()
 			else
 			{
 				//If we get here, then the client was disconnected, so close it and trigger the disconnection callback.
-				shutdown(*iter, SD_SEND);
-				closesocket(*iter);
+				shutdown(*iter, SHUT_RDWR);
+				close(*iter);
 				iter = m_connectedClients.erase(iter);
 				//TODO: Disconnect callback.
 				printf("Client disconnected.\n");
