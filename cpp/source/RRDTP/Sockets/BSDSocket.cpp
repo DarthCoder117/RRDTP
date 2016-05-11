@@ -73,7 +73,7 @@ E_SOCKET_ERROR BSDSocket::Connect(const char *ip, unsigned int port, E_SOCKET_PR
 	memset(&server, 0, sizeof(server));
 	server.sin_addr.s_addr = inet_addr(ip);
 	server.sin_family = AF_INET;
-	server.sin_port = htons(port);
+	server.sin_port = port;
 
 	int err = connect(m_socket, (struct sockaddr*)&server, sizeof(server));
 	perror("Connect");
@@ -85,7 +85,7 @@ E_SOCKET_ERROR BSDSocket::Connect(const char *ip, unsigned int port, E_SOCKET_PR
 	m_isServer = false;
 	return ESE_SUCCESS;
 }
-#include <iostream>
+
 E_SOCKET_ERROR BSDSocket::Listen(unsigned int port, E_SOCKET_PROTOCOL protocol)
 {
 	if (CommonInit(protocol) != ESE_SUCCESS)
@@ -128,8 +128,9 @@ HostID BSDSocket::Accept(E_SOCKET_ERROR *errorCodeOut)
 	int newSocket;
 	struct sockaddr_in client;
 	int c = sizeof(client);
-
+	
 	newSocket = accept(m_socket, (struct sockaddr*)&client, (socklen_t*)&c);
+	perror("Accept");
 	if (newSocket < 0)
 	{
 		if (errorCodeOut)
