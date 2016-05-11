@@ -58,8 +58,6 @@ namespace rrdtp
 		
 		~BSDSocket();
 
-        E_SOCKET_ERROR Establish(E_SOCKET_PROTOCOL protocol);
-
 		E_SOCKET_ERROR Connect(const char *ip, unsigned int port, E_SOCKET_PROTOCOL protocol);
 		
 		E_SOCKET_ERROR Listen(unsigned int port, E_SOCKET_PROTOCOL protocol);
@@ -74,9 +72,9 @@ namespace rrdtp
 
         HostID Read(const void *data, size_t sz, HostID hostID);
 
-	size_t Send(const void* data, size_t sz, HostID host);
+		size_t Send(const void* data, size_t sz, HostID host);
 		
-	void SendAll(const void* data, size_t sz);
+		void SendAll(const void* data, size_t sz);
 
         void Close();
 
@@ -84,6 +82,8 @@ namespace rrdtp
 
 
     private:
+
+		E_SOCKET_ERROR CommonInit(E_SOCKET_PROTOCOL protocol);
 
         void pollServer();
         void pollClient();
@@ -94,7 +94,7 @@ namespace rrdtp
         struct hostent *hPtr;
         struct sockaddr_in socketAddress;
         struct sockaddr_in remoteSocketInfo;
-        struct sockaddr_in socketInfo;
+        
         struct hostNamePtr *hostNamePtr1;
         int ip, m_socket;
         HostID remoteHost;

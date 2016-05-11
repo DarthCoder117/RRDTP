@@ -42,11 +42,17 @@ BSDSocket::~BSDSocket()
 
 }
 
-E_SOCKET_ERROR BSDSocket::Establish(E_SOCKET_PROTOCOL protocol)
+E_SOCKET_ERROR BSDSocket::CommonInit(E_SOCKET_PROTOCOL protocol)
 {
-    if ((m_SocketFD = socket(AF_INET,SOCK_STREAM,protocol)) == -1)
+	int p = IPPROTO_TCP;
+	if (protocol == ESP_UDP)
+	{
+		p = IPPROTO_UDP;
+	}
+
+	m_SocketFD = socket(AF_INET, SOCK_STREAM, p);
+    if (m_SocketFD == -1)
     {
-	printf("Error creating socket.\n");
         return ESE_FAILURE;
     }
 
@@ -55,7 +61,7 @@ E_SOCKET_ERROR BSDSocket::Establish(E_SOCKET_PROTOCOL protocol)
 
 E_SOCKET_ERROR BSDSocket::Connect(const char *ip, unsigned int port, E_SOCKET_PROTOCOL protocol)
 {
-	Establish(protocol);
+	CommonInit(protocol);
 
     bzero(&remoteSocketInfo, sizeof(HostID));
 
@@ -82,9 +88,12 @@ E_SOCKET_ERROR BSDSocket::Connect(const char *ip, unsigned int port, E_SOCKET_PR
 
 E_SOCKET_ERROR BSDSocket::Listen(unsigned int port, E_SOCKET_PROTOCOL protocol)
 {
-	Establish(protocol);
+	CommonInit(protocol);
 	
-    if (bind(m_SocketFD, (struct sockaddr *) &socketInfo, sizeof(struct sockaddr_in) < 0))
+	struct sockaddr_in socketInfo;
+
+
+    if (bind(m_SocketFD, (struct sockaddr *)&socketInfo, sizeof(struct sockaddr_in) < 0))
     {
         close(m_SocketFD);
         perror("bind");
