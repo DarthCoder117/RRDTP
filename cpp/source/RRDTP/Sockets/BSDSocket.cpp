@@ -32,7 +32,8 @@ static int m_SocketFD;
 
 BSDSocket::BSDSocket(DataRecievedCallback dataRecievedCallback, void* userPtr, ConnectionAcceptedCallback connectionAcceptedCallback)
     :Socket(dataRecievedCallback, userPtr, connectionAcceptedCallback),
-	m_isServer(false)
+	m_isServer(false),
+	m_socket(-1)
 
 {
    
@@ -163,7 +164,7 @@ void BSDSocket::Close()
 
 	shutdown(m_socket, SHUT_RDWR);
 	close(m_socket);
-	m_socket = NULL;
+	m_socket = -1;
 }
 
 size_t BSDSocket::Send(const void* data, size_t sz, HostID host)
@@ -194,7 +195,7 @@ void BSDSocket::SendAll(const void* data, size_t sz)
 
 void BSDSocket::Poll() 
 {
-	if (m_socket != NULL)
+	if (m_socket != -1)
 	{
 		if (m_isServer)
 		{
@@ -207,7 +208,7 @@ void BSDSocket::Poll()
 	}
 }
 
-void WinsockSocket::PollServer()
+void BSDSocket::PollServer()
 {
 	char data[2000];
 
@@ -275,7 +276,7 @@ void WinsockSocket::PollServer()
 	}
 }
 
-void WinsockSocket::PollClient()
+void BSDSocket::PollClient()
 {
 	char data[2000];
 
