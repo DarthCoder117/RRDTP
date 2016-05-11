@@ -31,7 +31,8 @@ static int m_SocketFD;
 
 
 BSDSocket::BSDSocket(DataRecievedCallback dataRecievedCallback, void* userPtr, ConnectionAcceptedCallback connectionAcceptedCallback)
-    :Socket(dataRecievedCallback, userPtr, connectionAcceptedCallback)
+    :Socket(dataRecievedCallback, userPtr, connectionAcceptedCallback),
+	m_isServer(false)
 
 {
    
@@ -50,7 +51,7 @@ E_SOCKET_ERROR BSDSocket::CommonInit(E_SOCKET_PROTOCOL protocol)
 		p = IPPROTO_UDP;
 	}
 
-	m_SocketFD = socket(AF_INET, SOCK_STREAM, p);
+	m_SocketFD = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, p);
     if (m_SocketFD == -1)
     {
         return ESE_FAILURE;
@@ -61,63 +62,59 @@ E_SOCKET_ERROR BSDSocket::CommonInit(E_SOCKET_PROTOCOL protocol)
 
 E_SOCKET_ERROR BSDSocket::Connect(const char *ip, unsigned int port, E_SOCKET_PROTOCOL protocol)
 {
-	CommonInit(protocol);
+	if (CommonInit(protocol) != ESE_SUCCESS)
+	{
+		return ESE_FAILURE;
+	}
 
-    bzero(&remoteSocketInfo, sizeof(HostID));
+	struct sockaddr_in server;
 
-    gethostname(sysHost, MAXHOSTNAME);
+	server.sin_addr.s_addr = inet_addr(ip);
+	server.sin_family = AF_INET;
+	server.sin_port = htons(port);
 
-    if((hPtr = gethostbyname((const char *) remoteHost)) == NULL)
-    {
-        perror("System hostname misconfigured." );
-        exit(EXIT_FAILURE);
-    }
+	int err = connect(m_socket, (struct sockaddr*)&server, sizeof(server));
+	if (err < 0)
+	{
+		return ESE_FAILURE;
+	}
 
-    memcpy((char*)&remoteSocketInfo.sin_addr, hPtr->h_addr, hPtr->h_length);
-    remoteSocketInfo.sin_family = AF_INET;
-    remoteSocketInfo.sin_port = htons((u_short)portNumber);
-
-    if((connect(m_SocketFD, (struct sockaddr*)&remoteSocketInfo,sizeof(protocol)) < 0))
-    {
-        close(m_SocketFD);
-        exit(EXIT_FAILURE);
-    }
-
-
+	m_isServer = false;
+	return ESE_SUCCESS;
 }
 
 E_SOCKET_ERROR BSDSocket::Listen(unsigned int port, E_SOCKET_PROTOCOL protocol)
 {
-	CommonInit(protocol);
+	if (CommonInit(protocol) != ESE_SUCCESS)
+	{
+		return ESE_FAILURE;
+	}
 	
-	struct sockaddr_in socketInfo;
+	struct sockaddr_in server;
 
+	server.sin_addr.s_addr = INADDR_ANY;
+	server.sin_family = AF_INET;
+	server.sin_port = htons(port);
 
-    if (bind(m_SocketFD, (struct sockaddr *)&socketInfo, sizeof(struct sockaddr_in) < 0))
+    if (bind(m_SocketFD, (struct sockaddr*)&server, sizeof(struct server) < 0))
     {
         close(m_SocketFD);
-        perror("bind");
-        exit(EXIT_FAILURE);
+		return ESE_FAILURE;
     }
 
-    server.sin_addr.s_addr = htonl(INADDR_ANY);
-    server.sin_family = AF_INET;
-    server.sin_port = htons(port);
+	if (listen(m_socket, 3) < 0)
+	{
+		return ESE_FAILURE;
+	}
 
-    int socketConnection;
-
-    if ((socketConnection = accept(m_SocketFD, NULL, NULL)) < 0) {
-
-        close(m_SocketFD);
-        exit(EXIT_FAILURE);
-    }
-
+	m_isServer = true;
+	return ESE_SUCCESS;
 }
 
-    bool BSDSocket ::IsServer()
-    {
-        return m_isServer;
-    }
+bool BSDSocket ::IsServer()
+{
+    return m_isServer;
+}
 
 
    HostID BSDSocket::Accept(E_SOCKET_ERROR *errorCodeOut)
