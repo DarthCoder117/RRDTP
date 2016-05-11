@@ -68,10 +68,6 @@ namespace rrdtp
 
         HostID Accept(E_SOCKET_ERROR* errorCodeOut=NULL);
 
-        HostID Write(const void *data, size_t sz, HostID hostID);
-
-        HostID Read(const void *data, size_t sz, HostID hostID);
-
 		size_t Send(const void* data, size_t sz, HostID host);
 		
 		void SendAll(const void* data, size_t sz);
@@ -85,9 +81,8 @@ namespace rrdtp
 
 		E_SOCKET_ERROR CommonInit(E_SOCKET_PROTOCOL protocol);
 
-        void pollServer();
-        void pollClient();
-
+        void PollServer();
+        void PollClient();
 
 		char sysHost [MAXHOSTNAME+1];
 		struct sockaddr_in server;
@@ -100,16 +95,9 @@ namespace rrdtp
         HostID remoteHost;
 		bool m_isServer;
 
+        std::list<int> m_connectedClients;
 
-
-
-        //std::list<int> m_connectedClients;
-
-        //E_SOCKET_ERROR establish(E_SOCKET_PROTOCOL protocol);
-
-
-
-
+		fd_set m_readFDS;///< FD set for reading.
     };
 }
 

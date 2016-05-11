@@ -51,8 +51,8 @@ E_SOCKET_ERROR BSDSocket::CommonInit(E_SOCKET_PROTOCOL protocol)
 		p = IPPROTO_UDP;
 	}
 
-	m_SocketFD = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, p);
-    if (m_SocketFD == -1)
+	m_socket = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, p);
+    if (m_socket == -1)
     {
         return ESE_FAILURE;
     }
@@ -96,9 +96,9 @@ E_SOCKET_ERROR BSDSocket::Listen(unsigned int port, E_SOCKET_PROTOCOL protocol)
 	server.sin_family = AF_INET;
 	server.sin_port = htons(port);
 
-    if (bind(m_SocketFD, (struct sockaddr*)&server, sizeof(struct server) < 0))
+    if (bind(m_socket, (struct sockaddr*)&server, sizeof(server) < 0))
     {
-        close(m_SocketFD);
+        close(m_socket);
 		return ESE_FAILURE;
     }
 
@@ -116,111 +116,200 @@ bool BSDSocket ::IsServer()
     return m_isServer;
 }
 
-
-   HostID BSDSocket::Accept(E_SOCKET_ERROR *errorCodeOut)
-    {
-        int newSocket;
-        struct sockaddr_in client;
-        int c = sizeof(client);
-
-        newSocket = accept(m_SocketFD, (struct sockaddr *)&client, (socklen_t *) &c);
-
-        if (newSocket < 0)
-        {
-            if (errorCodeOut)
-            {
-                *errorCodeOut = ESE_FAILURE;
-            }
-            return -1;
-        }
-
-        if(errorCodeOut)
-        {
-            *errorCodeOut = ESE_SUCCESS;
-        }
-
-
-        return size_t(newSocket);
-
-
-
-
-    }
-
-    HostID BSDSocket::Write(const void *data, size_t sz, HostID hostID)
-    {
-
-        if (m_isServer)
-        {
-            return write(hostID, (const char*)data, sz);
-        }
-
-        return write(m_SocketFD, (const char*)data, sz);
-
-
-    }
-
-HostID BSDSocket :: Read(const void *data, size_t sz, HostID hostID)
-
+HostID BSDSocket::Accept(E_SOCKET_ERROR *errorCodeOut)
 {
-    int readCount = 0;
-    int count = 0;
-    int numToRead = 32;
+	int newSocket;
+	struct sockaddr_in client;
+	int c = sizeof(client);
 
+	newSocket = accept(m_socket, (struct sockaddr*)&client, (socklen_t*)&c);
+	if (newSocket < 0)
+	{
+		if (errorCodeOut)
+		{
+			*errorCodeOut = ESE_FAILURE;
+		}
+		return -1;
+	}
 
+	if (errorCodeOut)
+	{
+		*errorCodeOut = ESE_SUCCESS;
+	}
 
-    while(count < numToRead)
-    {
-        if(readCount == read(m_SocketFD, (void *) data, sz - hostID))
-        {
-            count += readCount;
-            data += readCount;
+	m_connectedClients.push_back(newSocket);
 
-        }
-        else if(readCount < 0)
-        {
-            close(m_SocketFD);
-            exit(EXIT_FAILURE);
-        }
+	if (m_connectionAcceptedCallback != NULL)
+	{
+		m_connectionAcceptedCallback(this, newSocket);
+	}
 
-        printf("Numbers of bytes read: %d " , count );
-
-
-    }
-
-
-
-
+	return (HostID)newSocket;
 }
 
+void BSDSocket::Close()
+{
+	if (IsServer())
+	{
+		std::list<int>::iterator iter;
+		for (iter = m_connectedClients.begin(); iter != m_connectedClients.end(); ++iter)
+		{
+			shutdown(*iter, SHUT_RDWR);
+			close(*iter);
+		}
+
+		m_connectedClients.clear();
+	}
+
+	shutdown(m_socket, SHUT_RDWR);
+	close(m_socket);
+	m_socket = NULL;
+}
 
 size_t BSDSocket::Send(const void* data, size_t sz, HostID host)
 {
-	return 0;
+	if (m_isServer)//The server needs a host ID specified to send the data to.
+	{
+		return send((int)host, (const void*)data, sz, 0);
+	}
+
+	return send(m_socket, (const void*)data, sz, 0);
 }
 		
 void BSDSocket::SendAll(const void* data, size_t sz)
 {
-
+	if (m_isServer)//The server needs a host ID specified to send the data to.
+	{
+		std::list<int>::iterator iter;
+		for (iter = m_connectedClients.begin(); iter != m_connectedClients.end(); ++iter)
+		{
+			send(*iter, (const void*)data, sz, 0);
+		}
+	}
+	else
+	{
+		send(m_socket, (const void*)data, sz, 0);
+	}
 }
 
-
-    void BSDSocket :: Close()
-    {
-
-        //Close(m_SocketFD);
-    }
-
-void BSDSocket::Poll() {
-    /*if (m_SocketFD != NULL) {
-        if (m_isServer) {
-            pollServer();
-        }
-        else {
-            pollClient();
-        }
-    }*/
+void BSDSocket::Poll() 
+{
+	if (m_socket != NULL)
+	{
+		if (m_isServer)
+		{
+			PollServer();
+		}
+		else
+		{
+			PollClient();
+		}
+	}
 }
 
+void WinsockSocket::PollServer()
+{
+	char data[2000];
+
+	//Clear out the set before polling.
+	FD_ZERO(&m_readFDS);
+
+	//Add server socket to set
+	//FD_SET(m_socket, &m_readFDS);
+	int maxSd = 0;
+
+	//Add client sockets
+	std::list<int>::iterator iter;
+	for (iter = m_connectedClients.begin(); iter != m_connectedClients.end(); ++iter)
+	{
+		int sd = *iter;
+
+		FD_SET(sd, &m_readFDS);
+
+		if (sd > maxSd)
+		{
+			maxSd = sd;
+		}
+	}
+
+	//Check to see if any sockets can be read from.
+	struct timeval timeout;
+	timeout.tv_sec = 0;
+	timeout.tv_usec = 0;
+
+	int numReady = select(maxSd+1, &m_readFDS, NULL, NULL, &timeout);
+	if (numReady != -1 && numReady > 0)
+	{
+		//Iterate over each client socket and check for I/O events.
+		std::list<int>::iterator iter = m_connectedClients.begin();
+		while (iter != m_connectedClients.end())
+		{
+			//If the fds isn't set then there's no I/O event on this socket and we can move on.
+			if (!FD_ISSET(*iter, &m_readFDS))
+			{
+				continue;
+			}
+
+			//Otherwise there's data to be recieved.
+			int recievedDataSz = recv(*iter, data, 2000, 0);
+
+			if (recievedDataSz != -1)
+			{
+				if (m_dataRecievedCallback != NULL)
+				{
+					m_dataRecievedCallback(this, *iter, (void*)data, recievedDataSz);
+				}
+
+				++iter;
+			}
+			else
+			{
+				//If we get here, then the client was disconnected, so close it and trigger the disconnection callback.
+				shutdown(*iter, SD_SEND);
+				closesocket(*iter);
+				iter = m_connectedClients.erase(iter);
+				//TODO: Disconnect callback.
+				printf("Client disconnected.\n");
+			}
+		}
+	}
+}
+
+void WinsockSocket::PollClient()
+{
+	char data[2000];
+
+	//Clear out the set before polling.
+	FD_ZERO(&m_readFDS);
+
+	//Add socket to set
+	FD_SET(m_socket, &m_readFDS);
+
+	struct timeval timeout;
+	timeout.tv_sec = 0;
+	timeout.tv_usec = 0;
+
+	int numReady = select(0, &m_readFDS, NULL, NULL, &timeout);
+	if (numReady != -1 && numReady > 0)
+	{
+		int recievedDataSz = recv(m_socket, data, 2000, 0);
+
+		if (recievedDataSz != -1)
+		{
+			//Data was recieved, so trigger the callback.
+			if (m_dataRecievedCallback != NULL)
+			{
+				m_dataRecievedCallback(this, m_socket, (void*)data, recievedDataSz);
+			}
+		}
+		else
+		{
+			//Otherwise the server has disconnected, so close the socket and trigger the disconnection callback.
+			Close();
+			//TODO: Disconnect callback.
+			printf("Server disconnected.\n");
+		}
+	}
+}
 
 #endif
