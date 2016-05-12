@@ -56,6 +56,6 @@ class NativeLibrary
     
     static
     {
-        Native.register("rrdtp_module");
+        Native.register("librrdtp_module");
     }
 }
