@@ -1,7 +1,7 @@
 /*==============================================================================
 The MIT License (MIT)
 
-Copyright (c) 2016 Tanner Mickelson
+Copyright (c) 2016 Tanner Mickelson & The RRDTP Team
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,8 @@ SOFTWARE.
 #include <windows.h>
 #include <stdio.h>
 #pragma comment(lib,"ws2_32.lib")
+#elif defined(RRDTP_PLATFORM_UNIX)
+#include <arpa/inet.h>
 #endif
 
 using namespace rrdtp;
@@ -154,6 +156,72 @@ void LongEntry::Deserialize(DataBuffer& in)
 }
 
 //===============================================================================================
+//Float
+//===============================================================================================
+
+FloatEntry::FloatEntry(HostID owner, const char* identifier)
+	:Entry(owner, identifier),
+	m_float(0.0f)
+{}
+
+void FloatEntry::Set(float f)
+{
+	m_float = f;
+}
+
+float FloatEntry::Get()
+{
+	return m_float;
+}
+
+void FloatEntry::Serialize(DataBuffer& out)
+{
+	out.Write<float>(htonf(m_float));
+}
+
+void FloatEntry::Deserialize(DataBuffer& in)
+{
+	float val = 0;
+	if (in.Read<float>(val))
+	{
+		m_float = ntohf(val);
+	}
+}
+
+//===============================================================================================
+//Double
+//===============================================================================================
+
+DoubleEntry::DoubleEntry(HostID owner, const char* identifier)
+	:Entry(owner, identifier),
+	m_double(0.0)
+{}
+
+void DoubleEntry::Set(double f)
+{
+	m_double = f;
+}
+
+double DoubleEntry::Get()
+{
+	return m_double;
+}
+
+void DoubleEntry::Serialize(DataBuffer& out)
+{
+	out.Write<double>(htonll(m_double));
+}
+
+void DoubleEntry::Deserialize(DataBuffer& in)
+{
+	double val = 0;
+	if (in.Read<double>(val))
+	{
+		m_double = ntohll(val);
+	}
+}
+
+//===============================================================================================
 //Boolean
 //===============================================================================================
 
@@ -253,5 +321,81 @@ void StringEntry::EnsureCapacity(size_t sz)
 		}
 
 		m_string = new char[sz];
+	}
+}
+
+//===============================================================================================
+//Unformatted
+//===============================================================================================
+
+UnformattedEntry::UnformattedEntry(HostID owner, const char* identifier)
+	:Entry(owner, identifier),
+	m_capacity(0),
+	m_data(NULL)
+{}
+
+UnformattedEntry::~UnformattedEntry()
+{
+	if (m_data != NULL)
+	{
+		delete[] m_data;
+		m_data = NULL;
+	}
+}
+
+void UnformattedEntry::Set(char* data, size_t dataSz)
+{
+	if (dataSz == 0)
+	{
+		return;
+	}
+
+	//Reallocate memory if required
+	EnsureCapacity(dataSz);
+
+	//Copy to internal string
+	memcpy(m_data, data, dataSz);
+	m_dataSz = dataSz;
+}
+
+char* UnformattedEntry::Get()
+{
+	return m_data;
+}
+
+size_t UnformattedEntry::GetSize()
+{
+	return m_dataSz;
+}
+
+void UnformattedEntry::Serialize(DataBuffer& out)
+{
+	uint16_t len = (uint16_t)m_dataSz;
+	out.Write<uint16_t>(len);
+
+	out.Write((const unsigned char*)m_data, len);
+}
+
+void UnformattedEntry::Deserialize(DataBuffer& in)
+{
+	uint16_t len = 0;
+	in.Read<uint16_t>(len);
+
+	EnsureCapacity(len);
+	in.Read((const unsigned char*)m_data, len);
+	m_dataSz = len;
+}
+
+void UnformattedEntry::EnsureCapacity(size_t sz)
+{
+	if (m_capacity < sz)
+	{
+		if (m_data != NULL)
+		{
+			delete[] m_data;
+			m_data = NULL;
+		}
+
+		m_data = new char[sz];
 	}
 }

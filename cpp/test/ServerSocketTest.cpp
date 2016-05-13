@@ -1,4 +1,5 @@
 #include <RRDTP.h>
+#include <cstdlib>
 #include <iostream>
 #include <cassert>
 

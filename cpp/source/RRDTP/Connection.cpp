@@ -1,7 +1,7 @@
 /*==============================================================================
 The MIT License (MIT)
 
-Copyright (c) 2016 Tanner Mickelson
+Copyright (c) 2016 Tanner Mickelson & The RRDTP Team
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,6 @@ SOFTWARE.
 #include "RRDTP/DataBuffer.h"
 #include "RRDTP/Entry.h"
 #include <sstream>
-#include <cinttypes>
 #ifdef RRDTP_PLATFORM_WINDOWS
 #include <Winsock2.h>
 #endif
@@ -270,6 +269,58 @@ int64_t Connection::GetLong(const char* identifier, int64_t defaultVal)
 	{
 		//Return the value
 		return ((LongEntry*)entry)->Get();
+	}
+
+	return defaultVal;
+}
+
+void Connection::SetFloat(const char* identifier, float val)
+{
+	//Create/retrieve entry (id doesn't matter locally).
+	FloatEntry* entry = (FloatEntry*)m_localDataStore.Create(-1, identifier, EDT_FLOAT);
+	if (entry != NULL)
+	{
+		//Update the entry
+		entry->Set(val);
+
+		SendUpdatePacket(entry);
+	}
+}
+
+float Connection::GetFloat(const char* identifier, float defaultVal)
+{
+	//Retrieve entry
+	Entry* entry = m_localDataStore.Get(identifier);
+	if (entry != NULL && entry->GetType() == EDT_FLOAT)
+	{
+		//Return the value
+		return ((FloatEntry*)entry)->Get();
+	}
+
+	return defaultVal;
+}
+
+void Connection::SetDouble(const char* identifier, double val)
+{
+	//Create/retrieve entry (id doesn't matter locally).
+	DoubleEntry* entry = (DoubleEntry*)m_localDataStore.Create(-1, identifier, EDT_DOUBLE);
+	if (entry != NULL)
+	{
+		//Update the entry
+		entry->Set(val);
+
+		SendUpdatePacket(entry);
+	}
+}
+
+double Connection::GetDouble(const char* identifier, double defaultVal)
+{
+	//Retrieve entry
+	Entry* entry = m_localDataStore.Get(identifier);
+	if (entry != NULL && entry->GetType() == EDT_DOUBLE)
+	{
+		//Return the value
+		return ((DoubleEntry*)entry)->Get();
 	}
 
 	return defaultVal;

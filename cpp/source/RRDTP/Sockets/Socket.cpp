@@ -1,7 +1,7 @@
 /*==============================================================================
 The MIT License (MIT)
 
-Copyright (c) 2016 Tanner Mickelson
+Copyright (c) 2016 Tanner Mickelson & The RRDTP Team
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ SOFTWARE.
 
 #if defined(RRDTP_PLATFORM_WINDOWS)
 #include "RRDTP/Sockets/WinsockSocket.h"
-#elif defined(RRDTP_PLATFORM_LINUX)
+#elif defined(RRDTP_PLATFORM_UNIX)
 #include "RRDTP/Sockets/BSDSocket.h"
 #endif
 
@@ -36,7 +36,7 @@ Socket* Socket::Create(DataRecievedCallback dataRecievedCallback, void* userPtr,
 {
 	#if defined(RRDTP_PLATFORM_WINDOWS)
 	return new WinsockSocket(dataRecievedCallback, userPtr, connectionAcceptedCallback);
-	#elif defined(RRDTP_PLATFORM_LINUX)
+	#elif defined(RRDTP_PLATFORM_UNIX)
 	return new BSDSocket(dataRecievedCallback, userPtr, connectionAcceptedCallback);
 	#endif
 }

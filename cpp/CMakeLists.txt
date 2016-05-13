@@ -10,10 +10,13 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE}")
 
 #Core RRDTP library
-add_library(rrdtp_lib OBJECT ${rrdtp_SRC})
+#add_library(rrdtp_lib OBJECT ${rrdtp_SRC})
 
-add_library(rrdtp_static STATIC $<TARGET_OBJECTS:rrdtp_lib>)
-add_library(rrdtp_module MODULE $<TARGET_OBJECTS:rrdtp_lib>)
+#add_library(rrdtp_static STATIC $<TARGET_OBJECTS:rrdtp_lib>)
+#add_library(rrdtp_module MODULE $<TARGET_OBJECTS:rrdtp_lib>)
+add_library(rrdtp_static STATIC ${rrdtp_SRC})
+add_library(rrdtp_module MODULE ${rrdtp_SRC})
+#TODO: Link the static version into the module so we don't have to build twice.
 
 #Tests
 add_executable(server-socket-test "${PROJECT_SOURCE_DIR}/test/ServerSocketTest.cpp")
