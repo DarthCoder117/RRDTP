@@ -29,6 +29,7 @@ SOFTWARE.
 #if defined(RRDTP_PLATFORM_UNIX)
 #define MAXHOSTNAME 255
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <netinet/in.h>
