@@ -5,15 +5,29 @@ include_directories("${PROJECT_SOURCE_DIR}/source")
 
 file(GLOB_RECURSE rrdtp_SRC "${PROJECT_SOURCE_DIR}/source/*.h" "${PROJECT_SOURCE_DIR}/source/*.cpp")
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE}")
+#Output directory CPU architecture extension (x86 or x64 on Windows MSVC)
+set(archExtension "")
+
+message(STATUS "Checking for architecture")
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
+	message(STATUS "Using MSVC compiler")
+	if (${CMAKE_GENERATOR} MATCHES "Win64")
+		message(STATUS "Building for x64")
+		set(archExtension "x64")
+	elseif (${CMAKE_GENERATOR} MATCHES "ARM")
+		message(STATUS "Building for ARM")
+		set(archExtension "ARM")
+	else()
+		message(STATUS "Building for x86")
+		set(archExtension "x86")
+	endif()
+endif()
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib/${CMAKE_CXX_COMPILER_ID}/${archExtension}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib/${CMAKE_CXX_COMPILER_ID}/${archExtension}")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/${CMAKE_CXX_COMPILER_ID}/${archExtension}")
 
 #Core RRDTP library
-#add_library(rrdtp_lib OBJECT ${rrdtp_SRC})
-
-#add_library(rrdtp_static STATIC $<TARGET_OBJECTS:rrdtp_lib>)
-#add_library(rrdtp_module MODULE $<TARGET_OBJECTS:rrdtp_lib>)
 add_library(rrdtp_static STATIC ${rrdtp_SRC})
 add_library(rrdtp_module MODULE ${rrdtp_SRC})
 #TODO: Link the static version into the module so we don't have to build twice.
