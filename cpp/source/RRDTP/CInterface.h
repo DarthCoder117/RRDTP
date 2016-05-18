@@ -27,13 +27,14 @@ SOFTWARE.
 #include "RRDTP/Types.h"
 #include "RRDTP/Connection.h"
 #include "RRDTP/Entry.h"
+#include "RRDTP/Platform.h"
 #endif
 
-#if defined(_MSC_VER)
+#if defined(RRDTP_PLATFORM_WINDOWS)
 //  Microsoft 
 #define DLL_EXPORT __declspec(dllexport)
 #define DLL_IMPORT __declspec(dllimport)
-#elif defined(_GCC)
+#elif defined(RRDTP_PLATFORM_UNIX)
 //  GCC
 #define DLL_EXPORT __attribute__((visibility("default")))
 #define DLL_IMPORT

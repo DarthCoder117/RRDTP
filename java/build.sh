@@ -1,5 +1,13 @@
+cd ../cpp
 sh ../cpp/build.sh
+cd ../java
+rm -rf ./build
 mkdir ./build
-cp ../cpp/lib/librrdtp_module.so ./build/rrdtp_module.so
-javac -cp ./3rd-party/jna-4.2.2.jar:. -d ./build ./src/edu/cwu/rrdtp/*.java
-jar cvf ./build/rrdtp.jar ./3rd-party/jna-4.2.2.jar ./build/edu/cwu/rrdtp/*.class
+mkdir ./build/linux
+cp ../cpp/lib/GNU/librrdtp_module.so ./build/linux/rrdtp_module.so
+javac -cp ./3rd-party/*:. -d ./build ./src/edu/cwu/rrdtp/*.java
+cd build
+jar xf ../3rd-party/jna-4.2.2.jar
+rm -rf ./META-INF
+jar cvf rrdtp.jar ./*
+cd ../../
