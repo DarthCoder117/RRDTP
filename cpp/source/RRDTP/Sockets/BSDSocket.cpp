@@ -174,10 +174,10 @@ size_t BSDSocket::Send(const void* data, size_t sz, HostID host)
 {
 	if (m_isServer)//The server needs a host ID specified to send the data to.
 	{
-		return send((int)host, (const void*)data, sz, 0);
+		return send((int)host, data, sz, 0);
 	}
 
-	return send(m_socket, (const void*)data, sz, 0);
+	return send(m_socket, data, sz, 0);
 }
 		
 void BSDSocket::SendAll(const void* data, size_t sz)

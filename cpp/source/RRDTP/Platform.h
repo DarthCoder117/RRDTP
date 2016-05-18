@@ -38,6 +38,10 @@ SOFTWARE.
 //hton/ntoh
 #if defined(RRDTP_PLATFORM_WINDOWS)
 #include <Winsock2.h>
+#elif defined(__APPLE__)
+#include <arpa/inet.h>
+#define ntohf(x) ntohll(x)
+#define htonf(x) htonll(x)
 #elif defined(RRDTP_PLATFORM_UNIX)
 #include <arpa/inet.h>
 #define ntohll(x) htobe64(x)
