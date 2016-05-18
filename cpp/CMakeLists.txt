@@ -51,3 +51,6 @@ add_executable(full-server-test "${PROJECT_SOURCE_DIR}/test/FullServerTest.cpp")
 target_link_libraries (full-server-test rrdtp_static)
 add_executable(full-client-test "${PROJECT_SOURCE_DIR}/test/FullClientTest.cpp")
 target_link_libraries (full-client-test rrdtp_static)
+
+add_executable(full-example "${PROJECT_SOURCE_DIR}/test/FullExample.cpp")
+target_link_libraries (full-example rrdtp_static)
