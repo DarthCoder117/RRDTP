@@ -9,10 +9,15 @@ RRDTP and the associated Realtime Robotics Dashboard project, were developed at 
 * Tyler Swan - dashboard UI/library integration
 
 ## Building
-RRDTP has been tested on Windows, Linux, and Mac OSX. Arduino support is planned but not yet implemented.
-Use CMake to build the library and tests. Run ``cmake -G`` and specify the platform to generate project files for.
-``cmake -G Visual Studio 14`` for Visual Studio 2015, ``cmake -G Unix Makefiles`` for Linux, etc. 
-After the project files are generated, then just build normally in your preferred environment.
+RRDTP can be built easily using CMake on Windows, Linux, and Mac OSX. Arduino support is planned but not yet implemented.
+Automatic build scripts are included for Windows and Linux. Simply run build.bat or build.sh to build the library on your platform (automatic build is currently untested on Mac OSX).
+
+## Roadmap
+* Arduino support
+* Multithreading for supported platforms
+* Finish incomplete Java wrapper
+* Performance optimizations
+
 ## License
 The MIT License (MIT)
 
