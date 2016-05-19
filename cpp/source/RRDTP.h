@@ -32,5 +32,6 @@ SOFTWARE.
 #include "RRDTP/Types.h"
 #include "RRDTP/Sockets/Socket.h"
 #include "RRDTP/Connection.h"
+#include "RRDTP/Entry.h"
 
 #endif

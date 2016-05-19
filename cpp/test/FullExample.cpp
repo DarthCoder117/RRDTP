@@ -1,6 +1,43 @@
 #include <RRDTP.h>
 #include <iostream>
 
+void ValueChanged(rrdtp::Connection* connection, rrdtp::Entry* entry)
+{
+	std::cout << "Recieved: \"" << entry->GetIdentifier() << "\ = ";
+	if (entry->GetType() == rrdtp::EDT_INT)
+	{
+		rrdtp::IntEntry* newEnt = (rrdtp::IntEntry*)entry;
+		std::cout << newEnt->Get();
+	}
+	else if (entry->GetType() == rrdtp::EDT_LONG)
+	{
+		rrdtp::LongEntry* newEnt = (rrdtp::LongEntry*)entry;
+		std::cout << newEnt->Get();
+	}
+	else if (entry->GetType() == rrdtp::EDT_FLOAT)
+	{
+		rrdtp::FloatEntry* newEnt = (rrdtp::FloatEntry*)entry;
+		std::cout << newEnt->Get();
+	}
+	else if (entry->GetType() == rrdtp::EDT_DOUBLE)
+	{
+		rrdtp::DoubleEntry* newEnt = (rrdtp::DoubleEntry*)entry;
+		std::cout << newEnt->Get();
+	}
+	else if (entry->GetType() == rrdtp::EDT_BOOLEAN)
+	{
+		rrdtp::BooleanEntry* newEnt = (rrdtp::BooleanEntry*)entry;
+		std::cout << newEnt->Get();
+	}
+	else if (entry->GetType() == rrdtp::EDT_STRING)
+	{
+		rrdtp::StringEntry* newEnt = (rrdtp::StringEntry*)entry;
+		std::cout << "\"" << newEnt->Get() << "\"";
+	}
+
+	std::cout << "\n";
+}
+
 int main()
 {
 	rrdtp::Connection rrdtpConnection;
@@ -21,12 +58,15 @@ int main()
 		rrdtpConnection.StartClient(ip.c_str());
 	}
 
+	rrdtpConnection.SetValueChangedCallback(&ValueChanged);
+	
 	bool exitFlag = false;
 	while (!exitFlag)
 	{
 		std::cout << "\nSelect action.\n";
 		std::cout << "(a) send data\n";
-		std::cout << "(b) exit\n";
+		std::cout << "(b) receive data\n";
+		std::cout << "(c) exit\n";
 
 		char answer = 'y';
 		std::cin >> answer;
@@ -101,6 +141,10 @@ int main()
 			}
 		}
 		else if (answer == 'b')
+		{
+			std::cout << "\nReceiving data...\n";
+		}
+		else if (answer == 'c')
 		{
 			exitFlag = true;
 		}
