@@ -5,9 +5,40 @@
 
 void ValueChanged(rrdtp::Connection* connection, rrdtp::Entry* entry)
 {
-	assert(strcmp(entry->GetName(), "test-val") == 0);
+	std::cout << "Recieved: \"" << entry->GetIdentifier() << "\ = ";
+	if (entry->GetType() == rrdtp::EDT_INT)
+	{
+		rrdtp::IntEntry* newEnt = (rrdtp::IntEntry*)entry;
+		std::cout << newEnt->Get();
+	}
+	else if (entry->GetType() == rrdtp::EDT_LONG)
+	{
+		rrdtp::LongEntry* newEnt = (rrdtp::LongEntry*)entry;
+		std::cout << newEnt->Get();
+	}
+	else if (entry->GetType() == rrdtp::EDT_FLOAT)
+	{
+		rrdtp::FloatEntry* newEnt = (rrdtp::FloatEntry*)entry;
+		std::cout << newEnt->Get();
+	}
+	else if (entry->GetType() == rrdtp::EDT_DOUBLE)
+	{
+		rrdtp::DoubleEntry* newEnt = (rrdtp::DoubleEntry*)entry;
+		std::cout << newEnt->Get();
+	}
+	else if (entry->GetType() == rrdtp::EDT_BOOLEAN)
+	{
+		rrdtp::BooleanEntry* newEnt = (rrdtp::BooleanEntry*)entry;
+		std::cout << newEnt->Get();
+	}
+	else if (entry->GetType() == rrdtp::EDT_STRING)
+	{
+		rrdtp::StringEntry* newEnt = (rrdtp::StringEntry*)entry;
+		std::cout << "\"" << newEnt->Get() << "\"";
+	}
 
-	std::cout << "Recieved " << ((rrdtp::IntEntry*)entry)->Get() << "\n";
+	std::cout << "\n";
+	//std::cout << "Recieved " << ((rrdtp::IntEntry*)entry)->Get() << "\n";
 }
 
 int main()

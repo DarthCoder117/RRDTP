@@ -77,6 +77,14 @@ Entry* Entry::Create(const char* identifier, E_DATA_TYPE type)
 	{
 		return new LongEntry(0, identifier);
 	}
+	else if (type == EDT_FLOAT)
+	{
+		return new FloatEntry(0, identifier);
+	}
+	else if (type == EDT_DOUBLE)
+	{
+		return new DoubleEntry(0, identifier);
+	}
 	else if (type == EDT_BOOLEAN)
 	{
 		return new BooleanEntry(0, identifier);
@@ -282,10 +290,11 @@ void StringEntry::Set(const char* str)
 	}
 
 	//Reallocate memory if required
-	EnsureCapacity(length);
+	EnsureCapacity(length+1);
 
 	//Copy to internal string
 	memcpy(m_string, str, length);
+	m_string[length] = NULL;
 }
 
 const char* StringEntry::Get()

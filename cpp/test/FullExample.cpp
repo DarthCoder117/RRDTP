@@ -53,6 +53,7 @@ int main()
 	}
 	else
 	{
+		std::cout << "Please enter IP: ";
 		std::string ip = "";
 		std::cin >> ip;
 		rrdtpConnection.StartClient(ip.c_str());
@@ -79,16 +80,16 @@ int main()
 			std::string ident = "";
 			std::cin >> ident;
 
-			std::cout << "Please select data type.\n";
+			/*std::cout << "Please select data type.\n";
 			std::cout << "(a) int\n";
 			std::cout << "(b) long\n";
 			std::cout << "(c) float\n";
 			std::cout << "(d) double\n";
-			std::cout << "(e) boolean\n";
-			std::cout << "(f) string\n";
+			std::cout << "(e) boolean\n";*/
+			//std::cout << "(f) string\n";
 
 			char dataType = 'a';
-			std::cin >> dataType;
+			//std::cin >> dataType;
 			dataType = tolower(dataType);
 
 			if (dataType == 'a')
@@ -110,7 +111,7 @@ int main()
 			else if (dataType == 'c')
 			{
 				std::cout << "Please enter float value: ";
-				float val = 0;
+				float val = 0.0f;
 				std::cin >> val;
 
 				rrdtpConnection.SetFloat(ident.c_str(), val);
@@ -118,7 +119,7 @@ int main()
 			else if (dataType == 'd')
 			{
 				std::cout << "Please enter double value: ";
-				double val = 0;
+				double val = 0.0;
 				std::cin >> val;
 
 				rrdtpConnection.SetDouble(ident.c_str(), val);
@@ -126,19 +127,19 @@ int main()
 			else if (dataType == 'e')
 			{
 				std::cout << "Please enter boolean value: ";
-				bool val = 0;
+				bool val = false;
 				std::cin >> val;
 
 				rrdtpConnection.SetBool(ident.c_str(), val);
 			}
-			else if (dataType == 'f')
+			/*else if (dataType == 'f')
 			{
 				std::cout << "Please enter string value: ";
-				std::string val = 0;
+				std::string val = "";
 				std::cin >> val;
 
 				rrdtpConnection.SetString(ident.c_str(), val.c_str());
-			}
+			}*/
 		}
 		else if (answer == 'b')
 		{
