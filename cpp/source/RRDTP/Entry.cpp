@@ -203,15 +203,17 @@ float FloatEntry::Get()
 
 void FloatEntry::Serialize(DataBuffer& out)
 {
-	out.Write<float>(htonf(m_float));
+	uint32_t data = *((uint32_t*)&m_float);
+	out.Write<uint32_t>(htonl(data));
 }
 
 void FloatEntry::Deserialize(DataBuffer& in)
 {
-	float val = 0;
-	if (in.Read<float>(val))
+	uint32_t val = 0;
+	if (in.Read<uint32_t>(val))
 	{
-		m_float = ntohf(val);
+		val = ntohl(val);
+		m_float = *((float*)&val);
 	}
 }
 
@@ -236,15 +238,17 @@ double DoubleEntry::Get()
 
 void DoubleEntry::Serialize(DataBuffer& out)
 {
-	out.Write<double>(htonll(m_double));
+	uint64_t data = *((uint64_t*)&m_double);
+	out.Write<uint64_t>(htonll(data));
 }
 
 void DoubleEntry::Deserialize(DataBuffer& in)
 {
-	double val = 0;
-	if (in.Read<double>(val))
+	uint64_t val = 0;
+	if (in.Read<uint64_t>(val))
 	{
-		m_double = ntohll(val);
+		val = ntohll (val);
+		m_double = *((double*)&val);
 	}
 }
 
