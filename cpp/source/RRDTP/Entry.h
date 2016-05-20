@@ -40,7 +40,7 @@ namespace rrdtp
 
 		Entry(HostID owner, const char* identifier);
 
-		virtual ~Entry() {}
+		virtual ~Entry();
 
 		HostID GetOwner();
 
@@ -64,7 +64,7 @@ namespace rrdtp
 
 		HostID m_owner;
 
-		const char* m_identifier;
+		char* m_identifier;
 
 		const char* m_name;///< Pointer to the section of the identifier string where the name starts.
 	};
@@ -120,7 +120,7 @@ namespace rrdtp
 
 		FloatEntry(HostID owner, const char* identifier);
 
-		E_DATA_TYPE GetType() { return EDT_LONG; }
+		E_DATA_TYPE GetType() { return EDT_FLOAT; }
 
 		void Set(float f);
 
@@ -142,7 +142,7 @@ namespace rrdtp
 
 		DoubleEntry(HostID owner, const char* identifier);
 
-		E_DATA_TYPE GetType() { return EDT_LONG; }
+		E_DATA_TYPE GetType() { return EDT_DOUBLE; }
 
 		void Set(double d);
 
@@ -218,7 +218,7 @@ namespace rrdtp
 
 		~UnformattedEntry();
 
-		E_DATA_TYPE GetType() { return EDT_STRING; }
+		E_DATA_TYPE GetType() { return EDT_UNFORMATTED; }
 
 		///@brief Sets the data in the entry.
 		void Set(char* data, size_t dataSz);

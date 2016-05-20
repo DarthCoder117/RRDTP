@@ -80,16 +80,16 @@ int main()
 			std::string ident = "";
 			std::cin >> ident;
 
-			/*std::cout << "Please select data type.\n";
+			std::cout << "Please select data type.\n";
 			std::cout << "(a) int\n";
 			std::cout << "(b) long\n";
 			std::cout << "(c) float\n";
 			std::cout << "(d) double\n";
-			std::cout << "(e) boolean\n";*/
-			//std::cout << "(f) string\n";
+			std::cout << "(e) boolean\n";
+			std::cout << "(f) string\n";
 
 			char dataType = 'a';
-			//std::cin >> dataType;
+			std::cin >> dataType;
 			dataType = tolower(dataType);
 
 			if (dataType == 'a')
@@ -132,14 +132,14 @@ int main()
 
 				rrdtpConnection.SetBool(ident.c_str(), val);
 			}
-			/*else if (dataType == 'f')
+			else if (dataType == 'f')
 			{
 				std::cout << "Please enter string value: ";
 				std::string val = "";
 				std::cin >> val;
 
 				rrdtpConnection.SetString(ident.c_str(), val.c_str());
-			}*/
+			}
 		}
 		else if (answer == 'b')
 		{

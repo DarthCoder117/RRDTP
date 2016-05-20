@@ -38,18 +38,33 @@ using namespace rrdtp;
 
 Entry::Entry(HostID owner, const char* identifier)
 	:m_owner(owner),
-	m_identifier(identifier),
+	m_identifier(NULL),
 	m_name(NULL)
 {
 	assert(identifier != NULL);
 
+	//Copy identifier
+	int identifierLen = strlen(identifier);
+	m_identifier = new char[identifierLen + 1];
+	memcpy((void*)m_identifier, identifier, identifierLen);
+	m_identifier[identifierLen] = NULL;
+
 	//Set name pointer based on last index of '.'
-	m_name = strrchr(identifier, '.');
+	m_name = strrchr(m_identifier, '.');
 	//If there was no '.' then it's a top level identifier, and so the name is the same as the identifier.
 	if (m_name == NULL)
 	{
 		m_name = m_identifier;
 	}
+	else
+	{
+		m_name++;//Remove '.' from name
+	}
+}
+
+Entry::~Entry()
+{
+	delete[] m_identifier;
 }
 
 HostID Entry::GetOwner()
@@ -92,6 +107,10 @@ Entry* Entry::Create(const char* identifier, E_DATA_TYPE type)
 	else if (type == EDT_STRING)
 	{
 		return new StringEntry(0, identifier);
+	}
+	else if (type == EDT_UNFORMATTED)
+	{
+		return new UnformattedEntry(0, identifier);
 	}
 
 	return NULL;
@@ -315,8 +334,9 @@ void StringEntry::Deserialize(DataBuffer& in)
 	uint16_t len = 0;
 	in.Read<uint16_t>(len);
 
-	EnsureCapacity(len);
+	EnsureCapacity(len+1);
 	in.Read((const unsigned char*)m_string, len);
+	m_string[len] = NULL;
 }
 
 void StringEntry::EnsureCapacity(size_t sz)

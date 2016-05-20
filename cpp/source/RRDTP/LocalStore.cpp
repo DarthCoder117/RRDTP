@@ -27,6 +27,14 @@ SOFTWARE.
 
 using namespace rrdtp;
 
+Category::Category(const char* name)
+{
+	int nameLen = strlen(name);
+	m_name = new char[nameLen + 1];
+	memcpy((void*)m_name, name, nameLen);
+	m_name[nameLen] = NULL;
+}
+
 Category::~Category()
 {
 	List<Category*>::Node* c = m_subcategories.Begin();
@@ -48,6 +56,8 @@ Category::~Category()
 	}
 
 	m_entries.Clear();
+
+	delete[] m_name;
 }
 
 Category* Category::CreateSubcategory(const char* name)
@@ -144,8 +154,9 @@ Entry* LocalStore::Create(HostID owner, const char* identifier, E_DATA_TYPE type
 
 	//Create copy of string to tokenize.
 	int identifierLen = strlen(identifier);
-	char* identifierCopy = new char[identifierLen];
+	char* identifierCopy = new char[identifierLen+1];
 	memcpy(identifierCopy, identifier, identifierLen);
+	identifierCopy[identifierLen] = NULL;
 
 	//Loop over tokens
 	char* nextToken = NULL;
@@ -244,8 +255,9 @@ Entry* LocalStore::Get(const char* identifier)
 	Entry* entry = NULL;
 
 	int identifierLen = strlen(identifier);
-	char* identifierCopy = new char[identifierLen];
+	char* identifierCopy = new char[identifierLen+1];
 	memcpy(identifierCopy, identifier, identifierLen);
+	identifierCopy[identifierLen] = NULL;
 
 	//Loop over tokens
 	char* nextToken = NULL;

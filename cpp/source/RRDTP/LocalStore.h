@@ -83,9 +83,7 @@ namespace rrdtp
 
 		friend class LocalStore;
 
-		Category(const char* name)
-			:m_name(name)
-		{}
+		Category(const char* name);
 
 		Category(const Category& oth)
 		{}
@@ -93,7 +91,7 @@ namespace rrdtp
 		List<Category*> m_subcategories;
 		List<Entry*> m_entries;
 
-		const char* m_name;
+		char* m_name;
 	};
 
 	///@brief Class for managing local storage of data recieved over the network.
