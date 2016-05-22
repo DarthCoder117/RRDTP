@@ -36,12 +36,12 @@ public class StringEntry extends Entry
 		super(self);
 	}
 	
-	public final void Set(double val)
+	public final void Set(String val)
 	{
 		NativeLibrary.rrdtp_StringEntry_Set(self, val);
 	}
 	
-	public final double Get()
+	public final String Get()
 	{
 		return NativeLibrary.rrdtp_StringEntry_Get(self);
 	}

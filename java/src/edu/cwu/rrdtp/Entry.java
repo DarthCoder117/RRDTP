@@ -31,14 +31,14 @@ import com.sun.jna.Pointer;
  */
 public abstract class Entry 
 {
-	public final int EDT_INT = 0;
-	public final int EDT_LONG = 1;
-	public final int EDT_FLOAT = 2;
-	public final int EDT_DOUBLE = 3;
-	public final int EDT_BOOLEAN = 4
-	public final int EDT_STRING = 5;
+	public static final int EDT_INT = 0;
+	public static final int EDT_LONG = 1;
+	public static final int EDT_FLOAT = 2;
+	public static final int EDT_DOUBLE = 3;
+	public static final int EDT_BOOLEAN = 4;
+	public static final int EDT_STRING = 5;
 	
-    private Pointer self;
+    protected Pointer self;
 	
     public Entry(Pointer self)
 	{

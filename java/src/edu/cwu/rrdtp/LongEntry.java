@@ -25,6 +25,7 @@ SOFTWARE.
 package edu.cwu.rrdtp;
 
 import com.sun.jna.Pointer;
+import com.sun.jna.NativeLong;
 
 /**
  * Entry used to store the actual data values. Currently a work-in-progress.
@@ -38,11 +39,11 @@ public class LongEntry extends Entry
 	
 	public final void Set(long val)
 	{
-		NativeLibrary.rrdtp_LongEntry_Set(self, val);
+		NativeLibrary.rrdtp_LongEntry_Set(self, new NativeLong(val));
 	}
 	
 	public final long Get()
 	{
-		return NativeLibrary.rrdtp_LongEntry_Get(self);
+		return NativeLibrary.rrdtp_LongEntry_Get(self).longValue();
 	}
 }
