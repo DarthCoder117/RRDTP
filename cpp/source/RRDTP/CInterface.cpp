@@ -50,7 +50,6 @@ extern "C"
 		((rrdtp::Connection*)connection)->Poll();
 	}
 
-	//Entries
 	void rrdtp_SetInt(rrdtp_Connection* connection, const char* identifier, int val)
 	{
 		((rrdtp::Connection*)connection)->SetInt(identifier, val);
@@ -85,5 +84,90 @@ extern "C"
 	const char* rrdtp_GetString(rrdtp_Connection* connection, const char* identifier, const char* defaultVal)
 	{
 		return ((rrdtp::Connection*)connection)->GetString(identifier, defaultVal);
+	}
+
+	rrdtp_Category* rrdtp_GetCategory(rrdtp_Connection* connection, const char* identifier)
+	{
+		return (rrdtp_Category*)((rrdtp::Connection*)connection)->GetCategory(identifier);
+	}
+
+	rrdtp_Entry* rrdtp_GetEntry(rrdtp_Connection* connection, const char* identifier)
+	{
+		return (rrdtp_Entry*)((rrdtp::Connection*)connection)->GetEntry(identifier);
+	}
+
+	void rrdtp_DeleteEntry(rrdtp_Connection* connection, const char* identifier)
+	{
+		((rrdtp::Connection*)connection)->Delete(identifier);
+	}
+
+	//Entry
+	const char* rrdtp_Entry_GetName(rrdtp_Entry* entry)
+	{
+		return ((rrdtp::Entry*)entry)->GetName();
+	}
+
+	const char* rrdtp_Entry_GetIdentifier(rrdtp_Entry* entry)
+	{
+		return ((rrdtp::Entry*)entry)->GetIdentifier();
+	}
+
+	int rrdtp_Entry_GetType(rrdtp_Entry* entry)
+	{
+		return (int)((rrdtp::Entry*)entry)->GetType();
+	}
+
+	void rrdtp_IntEntry_Set(rrdtp_Entry* entry, int val)
+	{
+		((rrdtp::IntEntry*)entry)->Set(val);
+	}
+	int rrdtp_IntEntry_Get(rrdtp_Entry* entry)
+	{
+		return ((rrdtp::IntEntry*)entry)->Get();
+	}
+
+	void rrdtp_LongEntry_Set(rrdtp_Entry* entry, int64_t val)
+	{
+		((rrdtp::LongEntry*)entry)->Set(val);
+	}
+	int64_t rrdtp_LongEntry_Get(rrdtp_Entry* entry)
+	{
+		return ((rrdtp::LongEntry*)entry)->Get();
+	}
+
+	void rrdtp_FloatEntry_Set(rrdtp_Entry* entry, float val)
+	{
+		((rrdtp::FloatEntry*)entry)->Set(val);
+	}
+	float rrdtp_FloatEntry_Get(rrdtp_Entry* entry)
+	{
+		return ((rrdtp::FloatEntry*)entry)->Get();
+	}
+
+	void rrdtp_DoubleEntry_Set(rrdtp_Entry* entry, double val)
+	{
+		((rrdtp::DoubleEntry*)entry)->Set(val);
+	}
+	double rrdtp_DoubleEntry_Get(rrdtp_Entry* entry)
+	{
+		return ((rrdtp::DoubleEntry*)entry)->Get();
+	}
+
+	void rrdtp_BooleanEntry_Set(rrdtp_Entry* entry, bool val)
+	{
+		((rrdtp::BooleanEntry*)entry)->Set(val);
+	}
+	bool rrdtp_BooleanEntry_Get(rrdtp_Entry* entry)
+	{
+		return ((rrdtp::BooleanEntry*)entry)->Get();
+	}
+
+	void rrdtp_StringEntry_Set(rrdtp_Entry* entry, const char* str)
+	{
+		((rrdtp::StringEntry*)entry)->Set(str);
+	}
+	const char* rrdtp_StringEntry_Get(rrdtp_Entry* entry)
+	{
+		return ((rrdtp::StringEntry*)entry)->Get();
 	}
 }

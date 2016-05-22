@@ -41,6 +41,7 @@ SOFTWARE.
 #endif
 
 typedef void rrdtp_Connection;
+typedef void rrdtp_Category;
 typedef void rrdtp_Entry;
 
 extern "C"
@@ -53,7 +54,6 @@ extern "C"
 
 	DLL_EXPORT void rrdtp_PollConnection(rrdtp_Connection* connection);
 
-	//Entries
 	DLL_EXPORT void rrdtp_SetInt(rrdtp_Connection* connection, const char* identifier, int val);
 	DLL_EXPORT int rrdtp_GetInt(rrdtp_Connection* connection, const char* identifier, int defaultVal);
 
@@ -65,6 +65,37 @@ extern "C"
 
 	DLL_EXPORT void rrdtp_SetString(rrdtp_Connection* connection, const char* identifier, const char* str);
 	DLL_EXPORT const char* rrdtp_GetString(rrdtp_Connection* connection, const char* identifier, const char* defaultVal);
+	
+	DLL_EXPORT rrdtp_Category* rrdtp_GetCategory(rrdtp_Connection* connection, const char* identifier);
+
+	DLL_EXPORT rrdtp_Entry* rrdtp_GetEntry(rrdtp_Connection* connection, const char* identifier);
+
+	DLL_EXPORT void rrdtp_DeleteEntry(rrdtp_Connection* connection, const char* identifier);
+
+	//Entry
+	DLL_EXPORT const char* rrdtp_Entry_GetName(rrdtp_Entry* entry);
+
+	DLL_EXPORT const char* rrdtp_Entry_GetIdentifier(rrdtp_Entry* entry);
+
+	DLL_EXPORT int rrdtp_Entry_GetType(rrdtp_Entry* entry);
+
+	DLL_EXPORT void rrdtp_IntEntry_Set(rrdtp_Entry* entry, int val);
+	DLL_EXPORT int rrdtp_IntEntry_Get(rrdtp_Entry* entry);
+
+	DLL_EXPORT void rrdtp_LongEntry_Set(rrdtp_Entry* entry, int64_t val);
+	DLL_EXPORT int64_t rrdtp_LongEntry_Get(rrdtp_Entry* entry);
+
+	DLL_EXPORT void rrdtp_FloatEntry_Set(rrdtp_Entry* entry, float val);
+	DLL_EXPORT float rrdtp_FloatEntry_Get(rrdtp_Entry* entry);
+
+	DLL_EXPORT void rrdtp_DoubleEntry_Set(rrdtp_Entry* entry, double val);
+	DLL_EXPORT double rrdtp_DoubleEntry_Get(rrdtp_Entry* entry);
+
+	DLL_EXPORT void rrdtp_BooleanEntry_Set(rrdtp_Entry* entry, bool val);
+	DLL_EXPORT bool rrdtp_BooleanEntry_Get(rrdtp_Entry* entry);
+
+	DLL_EXPORT void rrdtp_StringEntry_Set(rrdtp_Entry* entry, const char* str);
+	DLL_EXPORT const char* rrdtp_StringEntry_Get(rrdtp_Entry* entry);
 }
 
 #endif
