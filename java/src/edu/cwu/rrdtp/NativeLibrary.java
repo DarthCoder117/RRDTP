@@ -33,6 +33,8 @@ Native wrapper for C++ RRDTP library. For internal use only.
 */
 class NativeLibrary 
 {
+	
+	
     //Connection
     public static native Pointer rrdtp_OpenServerConnection(int port);
     public static native Pointer rrdtp_OpenClientConnection(String ip, int port);
@@ -41,7 +43,6 @@ class NativeLibrary
 
     public static native void rrdtp_PollConnection(Pointer connection);
     
-    //Entries
     public static native void rrdtp_SetInt(Pointer connection, String identifier, int val);
     public static native int rrdtp_GetInt(Pointer connection, String identifier, int defaultVal);
 
@@ -54,6 +55,37 @@ class NativeLibrary
     public static native void rrdtp_SetString(Pointer connection, String identifier, String str);
     public static native String rrdtp_GetString(Pointer connection, String identifier, String defaultVal);
     
+	public static native Pointer rrdtp_GetCategory(Pointer connection, String identifier);
+
+	public static native Pointer rrdtp_GetEntry(Pointer connection, String identifier);
+
+	public static native void rrdtp_DeleteEntry(Pointer connection, String identifier);
+	
+	//Entry
+	public static native String rrdtp_Entry_GetName(Pointer entry);
+
+	public static native String rrdtp_Entry_GetIdentifier(Pointer entry);
+
+	public static native int rrdtp_Entry_GetType(Pointer entry);
+
+	public static native void rrdtp_IntEntry_Set(Pointer entry, int val);
+	public static native int rrdtp_IntEntry_Get(Pointer entry);
+
+	public static native void rrdtp_LongEntry_Set(Pointer entry, NativeLong val);
+	public static native NativeLong rrdtp_LongEntry_Get(Pointer entry);
+
+	public static native void rrdtp_FloatEntry_Set(Pointer entry, float val);
+	public static native float rrdtp_FloatEntry_Get(Pointer entry);
+
+	public static native void rrdtp_DoubleEntry_Set(Pointer entry, double val);
+	public static native double rrdtp_DoubleEntry_Get(Pointer entry);
+
+	public static native void rrdtp_BooleanEntry_Set(Pointer entry, boolean val);
+	public static native boolean rrdtp_BooleanEntry_Get(Pointer entry);
+
+	public static native void rrdtp_StringEntry_Set(Pointer entry, String str);
+	public static native String rrdtp_StringEntry_Get(Pointer entry);
+	
     static
     {
         Native.register("rrdtp_module");

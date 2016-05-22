@@ -24,10 +24,17 @@ SOFTWARE.
 
 package edu.cwu.rrdtp;
 
+import com.sun.jna.Pointer;
+
 /**
- * Category of entries. Currently a work-in-progress.
+ * Category of entries.
  */
 public class Category 
 {
-    
+	private Pointer self;
+	
+    public Category(Pointer self)
+	{
+		this.self = self;
+	}
 }

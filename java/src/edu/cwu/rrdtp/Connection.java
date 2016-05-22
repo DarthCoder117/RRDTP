@@ -131,4 +131,55 @@ public class Connection
     {
          return NativeLibrary.rrdtp_GetString(self, identifier, defaultVal);
     }
+	
+	public Category GetCategory(String identifier)
+	{
+		Pointer category = NativeLibrary.rrdtp_GetCategory(self, identifier);
+		if (category != null)
+		{
+			return new Category(category);
+		}
+		
+		return null;
+	}
+
+	public Entry GetEntry(String identifier)
+	{
+		Pointer entry = NativeLibrary.rrdtp_GetEntry(self, identifier);
+		if (entry != null)
+		{
+			int entryType = NativeLibrary.rrdtp_Entry_GetType(entry);
+			if (entryType == Entry.EDT_INT)
+			{
+				return new IntEntry(entry);
+			}
+			else if (entryType == Entry.EDT_LONG)
+			{
+				return new LongEntry(entry);
+			}
+			else if (entryType == Entry.EDT_FLOAT)
+			{
+				return new FloatEntry(entry);
+			}
+			else if (entryType == Entry.EDT_DOUBLE)
+			{
+				return new DoubleEntry(entry);
+			}
+			else if (entryType == Entry.EDT_BOOLEAN)
+			{
+				return new BooleanEntry(entry);
+			}
+			else if (entryType == Entry.EDT_STRING)
+			{
+				return new StringEntry(entry);
+			}
+		}
+		
+		return null;
+	}
+
+	public void DeleteEntry(String identifier)
+	{
+		NativeLibrary.rrdtp_DeleteEntry(self, identifier);
+	}
 }

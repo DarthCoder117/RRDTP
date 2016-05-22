@@ -21,33 +21,28 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ==============================================================================*/
-#ifndef Types_H
-#define Types_H
-#include <stdint.h>
 
-///@brief The RRDTP protocol version (different from library version)
-#define RRDTP_PROTOCOL_VERSION 1
+package edu.cwu.rrdtp;
 
-namespace rrdtp
+import com.sun.jna.Pointer;
+
+/**
+ * Entry used to store the actual data values. Currently a work-in-progress.
+ */
+public class IntEntry extends Entry
 {
-	///@brief Enum identifying the type of event a packet represents.
-	enum E_EVENT_TYPE
+    public IntEntry(Pointer self)
 	{
-		EET_SET,///< Create a named value on the server or a client.
-		EET_DELETE///< Remove a value entry from the server or a client.
-	};
-
-	///@brief Enum identifying the type of data to be sent in a data packet.
-	enum E_DATA_TYPE
+		super(self);
+	}
+	
+	public final void Set(int val)
 	{
-		EDT_INT = 0,///< Signed 32-bit integer
-		EDT_LONG = 1,///< Signed 64-bit integer
-		EDT_FLOAT = 2,///< single precision floating point
-		EDT_DOUBLE = 3,///< double precision floating point
-		EDT_BOOLEAN = 4,///< true/false boolean flag
-		EDT_STRING = 5,///< string value
-		EDT_UNFORMATTED = 6
-	};
+		NativeLibrary.rrdtp_IntEntry_Set(self, val);
+	}
+	
+	public final int Get()
+	{
+		return NativeLibrary.rrdtp_IntEntry_Get(self);
+	}
 }
-
-#endif

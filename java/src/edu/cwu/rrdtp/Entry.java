@@ -24,10 +24,39 @@ SOFTWARE.
 
 package edu.cwu.rrdtp;
 
+import com.sun.jna.Pointer;
+
 /**
  * Entry used to store the actual data values. Currently a work-in-progress.
  */
-public class Entry 
+public abstract class Entry 
 {
-    
+	public final int EDT_INT = 0;
+	public final int EDT_LONG = 1;
+	public final int EDT_FLOAT = 2;
+	public final int EDT_DOUBLE = 3;
+	public final int EDT_BOOLEAN = 4
+	public final int EDT_STRING = 5;
+	
+    private Pointer self;
+	
+    public Entry(Pointer self)
+	{
+		this.self = self;
+	}
+	
+	public final String GetName()
+	{
+		return NativeLibrary.rrdtp_Entry_GetName(self);
+	}
+	
+	public final String GetIdentifier()
+	{
+		return NativeLibrary.rrdtp_Entry_GetIdentifier(self);
+	}
+	
+	public final int GetType()
+	{
+		return NativeLibrary.rrdtp_Entry_GetType(self);
+	}
 }
