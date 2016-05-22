@@ -148,31 +148,38 @@ public class Connection
 		Pointer entry = NativeLibrary.rrdtp_GetEntry(self, identifier);
 		if (entry != null)
 		{
-			int entryType = NativeLibrary.rrdtp_Entry_GetType(entry);
-			if (entryType == Entry.EDT_INT)
-			{
-				return new IntEntry(entry);
-			}
-			else if (entryType == Entry.EDT_LONG)
-			{
-				return new LongEntry(entry);
-			}
-			else if (entryType == Entry.EDT_FLOAT)
-			{
-				return new FloatEntry(entry);
-			}
-			else if (entryType == Entry.EDT_DOUBLE)
-			{
-				return new DoubleEntry(entry);
-			}
-			else if (entryType == Entry.EDT_BOOLEAN)
-			{
-				return new BooleanEntry(entry);
-			}
-			else if (entryType == Entry.EDT_STRING)
-			{
-				return new StringEntry(entry);
-			}
+			return createEntryObject(entry);
+		}
+		
+		return null;
+	}
+	
+	private Entry createEntryObject(Pointer entry)//TODO: Use map to cache entry objects
+	{
+		int entryType = NativeLibrary.rrdtp_Entry_GetType(entry);
+		if (entryType == Entry.EDT_INT)
+		{
+			return new IntEntry(entry);
+		}
+		else if (entryType == Entry.EDT_LONG)
+		{
+			return new LongEntry(entry);
+		}
+		else if (entryType == Entry.EDT_FLOAT)
+		{
+			return new FloatEntry(entry);
+		}
+		else if (entryType == Entry.EDT_DOUBLE)
+		{
+			return new DoubleEntry(entry);
+		}
+		else if (entryType == Entry.EDT_BOOLEAN)
+		{
+			return new BooleanEntry(entry);
+		}
+		else if (entryType == Entry.EDT_STRING)
+		{
+			return new StringEntry(entry);
 		}
 		
 		return null;
@@ -181,5 +188,33 @@ public class Connection
 	public void DeleteEntry(String identifier)
 	{
 		NativeLibrary.rrdtp_DeleteEntry(self, identifier);
+	}
+	
+	public interface EntryChangeListener
+	{
+		void onEntryChanged(Entry entry);
+	}
+	
+	private ValueChangeCallbackImplementation extends NativeLibrary.ValueChangedCallback
+	{
+		private EntryChangeListener listener = null;
+		
+		ValueChangeCallbackImplementation(EntryChangeListener listener)
+		{
+			this.listener = listener;
+		}
+		
+		void invoke(Pointer connection, Pointer entry)
+		{
+			if (listener!=null)
+			{
+				listener.onEntryChanged(entry);
+			}
+		}
+	}
+	
+	public void SetEntryChangeListener(Pointer connection, EntryChangeListener listener)
+	{
+		NativeLibrary.rrdtp_SetValueChangedCallback(connection, new ValueChangeCallbackImplementation(listener));
 	}
 }

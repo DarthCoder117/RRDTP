@@ -101,6 +101,11 @@ extern "C"
 		((rrdtp::Connection*)connection)->Delete(identifier);
 	}
 
+	void rrdtp_SetValueChangedCallback(rrdtp_Connection* connection, rrdtp_ValueChangedCallback callback)
+	{
+		((rrdtp::Connection*)connection)->SetValueChangedCallback((rrdtp::ValueChangedCallback)callback);
+	}
+
 	//Entry
 	const char* rrdtp_Entry_GetName(rrdtp_Entry* entry)
 	{

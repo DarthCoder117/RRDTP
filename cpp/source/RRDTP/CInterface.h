@@ -43,6 +43,7 @@ SOFTWARE.
 typedef void rrdtp_Connection;
 typedef void rrdtp_Category;
 typedef void rrdtp_Entry;
+typedef void (*rrdtp_ValueChangedCallback)(rrdtp_Connection* connection, rrdtp_Entry* entry);
 
 extern "C"
 {
@@ -71,6 +72,8 @@ extern "C"
 	DLL_EXPORT rrdtp_Entry* rrdtp_GetEntry(rrdtp_Connection* connection, const char* identifier);
 
 	DLL_EXPORT void rrdtp_DeleteEntry(rrdtp_Connection* connection, const char* identifier);
+
+	DLL_EXPORT void rrdtp_SetValueChangedCallback(rrdtp_Connection* connection, rrdtp_ValueChangedCallback callback);
 
 	//Entry
 	DLL_EXPORT const char* rrdtp_Entry_GetName(rrdtp_Entry* entry);

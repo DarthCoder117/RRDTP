@@ -33,7 +33,10 @@ Native wrapper for C++ RRDTP library. For internal use only.
 */
 class NativeLibrary 
 {
-	
+	interface ValueChangedCallback extends Callback 
+	{
+        void invoke(Pointer connection, Pointer entry);
+    }
 	
     //Connection
     public static native Pointer rrdtp_OpenServerConnection(int port);
@@ -60,6 +63,8 @@ class NativeLibrary
 	public static native Pointer rrdtp_GetEntry(Pointer connection, String identifier);
 
 	public static native void rrdtp_DeleteEntry(Pointer connection, String identifier);
+	
+	public static native void rrdtp_SetValueChangedCallback(Pointer connection, ValueChangedCallback callback);
 	
 	//Entry
 	public static native String rrdtp_Entry_GetName(Pointer entry);
