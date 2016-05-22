@@ -26,6 +26,7 @@ package edu.cwu.rrdtp;
 
 import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
+import com.sun.jna.Callback;
 import com.sun.jna.Pointer;
 
 /*
@@ -33,7 +34,7 @@ Native wrapper for C++ RRDTP library. For internal use only.
 */
 class NativeLibrary 
 {
-	interface ValueChangedCallback extends Callback 
+	public interface ValueChangedCallback extends Callback 
 	{
         void invoke(Pointer connection, Pointer entry);
     }

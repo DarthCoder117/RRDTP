@@ -192,23 +192,23 @@ public class Connection
 	
 	public interface EntryChangeListener
 	{
-		void onEntryChanged(Entry entry);
+		public void onEntryChanged(Entry entry);
 	}
 	
-	private ValueChangeCallbackImplementation extends NativeLibrary.ValueChangedCallback
+	private class ValueChangeCallbackImplementation implements NativeLibrary.ValueChangedCallback
 	{
 		private EntryChangeListener listener = null;
 		
-		ValueChangeCallbackImplementation(EntryChangeListener listener)
+		public ValueChangeCallbackImplementation(EntryChangeListener listener)
 		{
 			this.listener = listener;
 		}
 		
-		void invoke(Pointer connection, Pointer entry)
+		public void invoke(Pointer connection, Pointer entry)
 		{
 			if (listener!=null)
 			{
-				listener.onEntryChanged(entry);
+				listener.onEntryChanged(createEntryObject(entry));
 			}
 		}
 	}
