@@ -54,3 +54,6 @@ target_link_libraries (full-client-test rrdtp_static)
 
 add_executable(full-example "${PROJECT_SOURCE_DIR}/test/FullExample.cpp")
 target_link_libraries (full-example rrdtp_static)
+
+add_executable(sensor-sim "${PROJECT_SOURCE_DIR}/test/SensorSimulator.cpp")
+target_link_libraries (sensor-sim rrdtp_static)
