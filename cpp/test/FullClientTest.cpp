@@ -5,7 +5,7 @@
 
 void ValueChanged(rrdtp::Connection* connection, rrdtp::Entry* entry)
 {
-	std::cout << "Recieved: \"" << entry->GetIdentifier() << "\ = ";
+	std::cout << "Recieved: \"" << entry->GetIdentifier() << "\" = ";
 	if (entry->GetType() == rrdtp::EDT_INT)
 	{
 		rrdtp::IntEntry* newEnt = (rrdtp::IntEntry*)entry;
@@ -55,7 +55,7 @@ int main()
 	{
 		client.Poll();
 
-		int newVal = client.GetInt("test-val");
+		int newVal = client.GetBool("flags.i");
 		if (newVal != oldVal)
 		{
 			std::cout << "GetInt returned " << newVal << "\n";

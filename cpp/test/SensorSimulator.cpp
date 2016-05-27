@@ -26,8 +26,6 @@ int main()
 	float testFloat = 0.0f;
 	bool increaseFlag = true;
 
-	unsigned int iterationCount = 0;
-
 	bool testBool = true;
 
 	bool exitFlag = false;
@@ -58,14 +56,7 @@ int main()
 
 		rrdtpConnection.SetInt("sensors.random", rand()%500);
 
-		iterationCount++;
-
-		if (iterationCount % 30 == 0)
-		{
-			testBool = !testBool;
-		}
-
-		rrdtpConnection.SetBool("sensors.switch", testBool);
+		rrdtpConnection.SetBool("flags.increasing", increaseFlag);
 
 		rrdtpConnection.Poll();
 		

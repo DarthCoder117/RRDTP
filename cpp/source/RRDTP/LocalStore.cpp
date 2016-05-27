@@ -271,6 +271,10 @@ Entry* LocalStore::Get(const char* identifier)
 		if (nextToken != NULL)
 		{
 			category = category->GetSubcategory(token);
+			if (!category)
+			{
+				return NULL;
+			}
 		}
 		//Otherwise we've reached the value.
 		else

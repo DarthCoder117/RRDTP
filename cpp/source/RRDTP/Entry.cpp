@@ -279,10 +279,8 @@ void BooleanEntry::Serialize(DataBuffer& out)
 void BooleanEntry::Deserialize(DataBuffer& in)
 {
 	uint8_t val = 0;
-	if (in.Read<uint8_t>(val))
-	{
-		m_boolean = (val != 0);
-	}
+	in.Read<uint8_t>(val);
+	m_boolean = (val != 0);
 }
 
 //===============================================================================================
