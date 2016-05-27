@@ -45,4 +45,10 @@ public class FloatEntry extends Entry
 	{
 		return NativeLibrary.rrdtp_FloatEntry_Get(self);
 	}
+	
+	@Override
+	public String toString()
+	{
+		return Float.toString(Get());
+	}
 }

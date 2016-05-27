@@ -45,4 +45,10 @@ public class DoubleEntry extends Entry
 	{
 		return NativeLibrary.rrdtp_DoubleEntry_Get(self);
 	}
+	
+	@Override
+	public String toString()
+	{
+		return Double.toString(Get());
+	}
 }

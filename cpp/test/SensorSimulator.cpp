@@ -54,9 +54,9 @@ int main()
 			}
 		}
 
-		//rrdtpConnection.SetFloat("sensors.pulse", testFloat);
+		rrdtpConnection.SetFloat("sensors.pulse", testFloat);
 
-		//rrdtpConnection.SetInt("sensors.random", rand()%500);
+		rrdtpConnection.SetInt("sensors.random", rand()%500);
 
 		iterationCount++;
 

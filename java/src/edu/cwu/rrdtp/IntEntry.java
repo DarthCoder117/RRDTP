@@ -45,4 +45,10 @@ public class IntEntry extends Entry
 	{
 		return NativeLibrary.rrdtp_IntEntry_Get(self);
 	}
+	
+	@Override
+	public String toString()
+	{
+		return Integer.toString(Get());
+	}
 }

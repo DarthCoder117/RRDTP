@@ -45,4 +45,10 @@ public class StringEntry extends Entry
 	{
 		return NativeLibrary.rrdtp_StringEntry_Get(self);
 	}
+	
+	@Override
+	public String toString()
+	{
+		return Get();
+	}
 }

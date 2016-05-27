@@ -45,4 +45,10 @@ public class BooleanEntry extends Entry
 	{
 		return NativeLibrary.rrdtp_BooleanEntry_Get(self);
 	}
+	
+	@Override
+	public String toString()
+	{
+		return Boolean.toString(Get());
+	}
 }

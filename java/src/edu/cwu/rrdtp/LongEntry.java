@@ -46,4 +46,10 @@ public class LongEntry extends Entry
 	{
 		return NativeLibrary.rrdtp_LongEntry_Get(self).longValue();
 	}
+	
+	@Override
+	public String toString()
+	{
+		return Long.toString(Get());
+	}
 }
