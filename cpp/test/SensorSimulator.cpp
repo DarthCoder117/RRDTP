@@ -1,5 +1,6 @@
 #include <RRDTP.h>
 #include <iostream>
+#include <ctime>
 
 int main()
 {
@@ -27,6 +28,8 @@ int main()
 	bool increaseFlag = true;
 
 	bool testBool = true;
+
+	srand(time(NULL));
 
 	bool exitFlag = false;
 	while (!exitFlag)

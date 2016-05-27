@@ -42,47 +42,48 @@ void Connection::dataRecieved(Socket* self, HostID sender, void* data, size_t da
 
 		//Protocol version and event type are common to all packets.
 		char protocolVersion = 0;
-		buffer.Read<char>(protocolVersion);
-
-		char eventType = 0;
-		buffer.Read<char>(eventType);
-
-		//Depending on the event type, different packets may have different contents.
-		if (eventType == EET_SET || eventType == EET_DELETE)
+		while (buffer.Read<char>(protocolVersion) && protocolVersion == 1)
 		{
-			//SET and DELETE both start with the value identifier, so we read that here.
+			char eventType = 0;
+			buffer.Read<char>(eventType);
 
-			//Length of value identifier
-			char identifierLength = 0;
-			buffer.Read<char>(identifierLength);
-
-			//Value identifier string.
-			char identifier[255];
-			buffer.Read((unsigned char*)identifier, identifierLength);
-			identifier[identifierLength] = '\0';
-
-			if (eventType == EET_SET)
+			//Depending on the event type, different packets may have different contents.
+			if (eventType == EET_SET || eventType == EET_DELETE)
 			{
-				//Data type
-				char dataType = 0;
-				buffer.Read<char>(dataType);
+				//SET and DELETE both start with the value identifier, so we read that here.
 
-				//Create/retrieve the entry and let it deserialize itself.
-				Entry* entry = connection->m_localDataStore.Create(sender, identifier, (E_DATA_TYPE)dataType);
-				if (entry != NULL && entry->GetType() == dataType)
+				//Length of value identifier
+				char identifierLength = 0;
+				buffer.Read<char>(identifierLength);
+
+				//Value identifier string.
+				char identifier[255];
+				buffer.Read((unsigned char*)identifier, identifierLength);
+				identifier[identifierLength] = '\0';
+
+				if (eventType == EET_SET)
 				{
-					entry->Deserialize(buffer);
+					//Data type
+					char dataType = 0;
+					buffer.Read<char>(dataType);
 
-					//Trigger value change callback
-					if (connection->m_valueChangedCallback)
+					//Create/retrieve the entry and let it deserialize itself.
+					Entry* entry = connection->m_localDataStore.Create(sender, identifier, (E_DATA_TYPE)dataType);
+					if (entry != NULL && entry->GetType() == dataType)
 					{
-						connection->m_valueChangedCallback(connection, entry);
+						entry->Deserialize(buffer);
+
+						//Trigger value change callback
+						if (connection->m_valueChangedCallback)
+						{
+							connection->m_valueChangedCallback(connection, entry);
+						}
 					}
 				}
-			}
-			else if(eventType == EET_DELETE)
-			{
-				connection->m_localDataStore.Delete(identifier);
+				else if (eventType == EET_DELETE)
+				{
+					connection->m_localDataStore.Delete(identifier);
+				}
 			}
 		}
 	}
