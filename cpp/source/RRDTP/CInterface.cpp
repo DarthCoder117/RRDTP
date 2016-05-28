@@ -68,6 +68,24 @@ extern "C"
 		return ((rrdtp::Connection*)connection)->GetLong(identifier, defaultVal);
 	}
 
+	void rrdtp_SetFloat(rrdtp_Connection* connection, const char* identifier, float val)
+	{
+		((rrdtp::Connection*)connection)->SetFloat(identifier, val);
+	}
+	float rrdtp_GetFloat(rrdtp_Connection* connection, const char* identifier, float defaultVal)
+	{
+		return ((rrdtp::Connection*)connection)->GetFloat(identifier, defaultVal);
+	}
+
+	void rrdtp_SetDouble(rrdtp_Connection* connection, const char* identifier, double val)
+	{
+		((rrdtp::Connection*)connection)->SetDouble(identifier, val);
+	}
+	double rrdtp_GetDouble(rrdtp_Connection* connection, const char* identifier, double defaultVal)
+	{
+		return ((rrdtp::Connection*)connection)->GetDouble(identifier, defaultVal);
+	}
+
 	void rrdtp_SetBool(rrdtp_Connection* connection, const char* identifier, bool val)
 	{
 		((rrdtp::Connection*)connection)->SetBool(identifier, val);

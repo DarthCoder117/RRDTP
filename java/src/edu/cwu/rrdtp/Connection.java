@@ -105,7 +105,33 @@ public class Connection
     {
         return NativeLibrary.rrdtp_GetLong(self, identifier, new NativeLong(defaultVal)).longValue();
     }
+	
+	public void SetFloat(String identifier, float val)
+    {
+        NativeLibrary.rrdtp_SetFloat(self, identifier, val);
+    }
+    public float GetFloat(String identifier)
+    {
+        return GetFloat(identifier, 0.0f);
+    }
+    public float GetFloat(String identifier, float defaultVal)
+    {
+        return NativeLibrary.rrdtp_GetFloat(self, identifier, defaultVal);
+    }
 
+	public void SetDouble(String identifier, double val)
+    {
+        NativeLibrary.rrdtp_SetDouble(self, identifier, val);
+    }
+    public double GetDouble(String identifier)
+    {
+        return GetDouble(identifier, 0.0);
+    }
+    public double GetDouble(String identifier, double defaultVal)
+    {
+        return NativeLibrary.rrdtp_GetDouble(self, identifier, defaultVal);
+    }
+	
     public void SetBool(String identifier, boolean val)
     {
         NativeLibrary.rrdtp_SetBool(self, identifier, val);

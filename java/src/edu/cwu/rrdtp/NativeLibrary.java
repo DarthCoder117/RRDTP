@@ -52,6 +52,12 @@ class NativeLibrary
 
     public static native void rrdtp_SetLong(Pointer connection, String identifier, NativeLong val);
     public static native NativeLong rrdtp_GetLong(Pointer connection, String identifier, NativeLong defaultVal);
+	
+	public static native void rrdtp_SetFloat(Pointer connection, String identifier, float val);
+    public static native float rrdtp_GetFloat(Pointer connection, String identifier, float defaultVal);
+
+    public static native void rrdtp_SetDouble(Pointer connection, String identifier, double val);
+    public static native double rrdtp_GetDouble(Pointer connection, String identifier, double defaultVal);
 
     public static native void rrdtp_SetBool(Pointer connection, String identifier, boolean val);
     public static native boolean rrdtp_GetBool(Pointer connection, String identifier, boolean defaultVal);

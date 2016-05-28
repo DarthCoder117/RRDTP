@@ -61,6 +61,12 @@ extern "C"
 	DLL_EXPORT void rrdtp_SetLong(rrdtp_Connection* connection, const char* identifier, int64_t val);
 	DLL_EXPORT int64_t rrdtp_GetLong(rrdtp_Connection* connection, const char* identifier, int64_t defaultVal);
 
+	DLL_EXPORT void rrdtp_SetFloat(rrdtp_Connection* connection, const char* identifier, float val);
+	DLL_EXPORT float rrdtp_GetFloat(rrdtp_Connection* connection, const char* identifier, float defaultVal);
+
+	DLL_EXPORT void rrdtp_SetDouble(rrdtp_Connection* connection, const char* identifier, double val);
+	DLL_EXPORT double rrdtp_GetDouble(rrdtp_Connection* connection, const char* identifier, double defaultVal);
+
 	DLL_EXPORT void rrdtp_SetBool(rrdtp_Connection* connection, const char* identifier, bool val);
 	DLL_EXPORT bool rrdtp_GetBool(rrdtp_Connection* connection, const char* identifier, bool defaultVal);
 
